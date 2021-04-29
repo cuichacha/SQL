@@ -1202,3 +1202,31 @@ from (select e.NAME as areaName,
       where b.ZDRID = '5_2020103014402200001') t;
 
 
+select *
+from TBL_VIID_ZDR_PERSONDOC p
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID
+where length(RESIDENCEADMINDIVISION) = 6;
+
+select *
+from EQP_AREA
+where name like '%铜%';
+
+select *
+from EQP_AREA where ID like '61%';
+
+select *
+from EQP_AREA where EQP_AREA.ID = '610403';
+
+select RESIDENCEADMINDIVISION, LONGITUDE, LATITUDE
+from TBL_VIID_ZDR_PERSONDOC;
+
+select e.NAME      as placeCodeName,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID
+where length(p.RESIDENCEADMINDIVISION) = 4;
