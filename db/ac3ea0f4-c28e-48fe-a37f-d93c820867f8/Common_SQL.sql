@@ -1199,7 +1199,8 @@ from (select e.NAME as areaName,
       from TBL_VIID_ZDR_BASICINFO b
                left join TBL_VIID_ZDR_PERSONDOC p on b.ZDRID = p.ZDRID
                left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID
-      ) t order by t.XM, t.GMSFHM nulls last;
+     ) t
+order by t.XM, t.GMSFHM nulls last;
 
 
 
@@ -1295,5 +1296,5 @@ from (select RESIDENCEADMINDIVISION, count(1) as count
       where substr(RESIDENCEADMINDIVISION, -2, 2) != '00'
         and length(RESIDENCEADMINDIVISION) = '6'
       group by RESIDENCEADMINDIVISION) p
-         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
 
