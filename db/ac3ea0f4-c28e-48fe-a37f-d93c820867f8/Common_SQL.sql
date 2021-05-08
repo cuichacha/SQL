@@ -1317,7 +1317,7 @@ from (select substr(RESIDENCEADMINDIVISION, 0, 4) as placeCode,
       where LONGITUDE is not null
         and LATITUDE is not null
       group by substr(RESIDENCEADMINDIVISION, 0, 4)) p
-         left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID
+         left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID;
 
 select p.RESIDENCEADMINDIVISION, e.NAME, e.LONGITUDE, e.LATITUDE, p.count
 from (select RESIDENCEADMINDIVISION, count(1) as count
@@ -1328,3 +1328,17 @@ from (select RESIDENCEADMINDIVISION, count(1) as count
         and LATITUDE is not null
       group by RESIDENCEADMINDIVISION) p
          left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
+
+
+select RPAD(p.placeCode, 6, '0') as RESIDENCEADMINDIVISION, e.NAME, p.count, e.LONGITUDE, e.LATITUDE
+from (select substr(RESIDENCEADMINDIVISION, 0, 4) as placeCode, count(1) as count
+      from TBL_VIID_ZDR_PERSONDOC
+      where LONGITUDE is not null
+        and LATITUDE is not null
+      group by substr(RESIDENCEADMINDIVISION, 0, 4)) p
+         left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID;
+
+
+
+
+

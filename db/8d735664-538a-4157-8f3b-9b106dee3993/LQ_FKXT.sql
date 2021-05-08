@@ -24,7 +24,10 @@ select count(1) as count, to_char(trunc(CREATEDATE), 'yyyy-mm-dd') as day
 from KEYUNIT_VISITOR
 group by trunc(CREATEDATE);
 
+
+
 select r.ROLENAME,
+       c.CNT,
        a.ID,
        a.KEYUNITID,
        a.NAME,
@@ -47,6 +50,10 @@ select r.ROLENAME,
        a.DEALNOTES,
        a.CREATETOR
 from KEYUNIT_ALARM a
-         left join ROLEINFO r on a.KEYUNITID = r.ROLEID
+         left join ROLEINFO r on a.KEYUNITID = r.ROLEID left join CODEDETAIL c on a.GENDERCODE = c.TYPEID
 where a.CREATEDATE >= ''
-  and a.CREATEDATE <= '';
+  and a.CREATEDATE <= ''
+and a.KEYUNITID = ''
+and a.GENDERCODE = ''
+and a.CERTIFICATE = ''
+and a.NAME like '';
