@@ -17,4 +17,36 @@ where CREATEDATE <= sysdate
   and CREATEDATE >= to_date(to_char(sysdate, 'yyyy-mm-dd'), 'yyyy-mm-dd hh24:mi:ss');
 
 select count(1)
-from KEYUNIT_VISITOR where trunc(CREATEDATE) = trunc(sysdate);
+from KEYUNIT_VISITOR
+where trunc(CREATEDATE) = trunc(sysdate);
+
+select count(1) as count, to_char(trunc(CREATEDATE), 'yyyy-mm-dd') as day
+from KEYUNIT_VISITOR
+group by trunc(CREATEDATE);
+
+select r.ROLENAME,
+       a.ID,
+       a.KEYUNITID,
+       a.NAME,
+       a.CERTIFICATE,
+       a.GENDERCODE,
+       a.ADDRESS,
+       a.ALARMTYPE,
+       a.CERTIFICATEPHOTO,
+       a.PHOTO,
+       a.SIMILARITY,
+       a.PERSONMINORCATEGORIES,
+       a.CREATEDATE,
+       a.AREACODE,
+       a.AREANAME,
+       a.POLICE,
+       a.UPLOADDATE,
+       a.UPLOADSTATUS,
+       a.UPLOADMSG,
+       a.ISDEAL,
+       a.DEALNOTES,
+       a.CREATETOR
+from KEYUNIT_ALARM a
+         left join ROLEINFO r on a.KEYUNITID = r.ROLEID
+where a.CREATEDATE >= ''
+  and a.CREATEDATE <= '';

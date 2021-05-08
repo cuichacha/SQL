@@ -1298,3 +1298,33 @@ from (select RESIDENCEADMINDIVISION, count(1) as count
       group by RESIDENCEADMINDIVISION) p
          left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
 
+select e.NAME      as placeCodeName,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null;
+
+select RPAD(p.placeCode, 6, '0') as RESIDENCEADMINDIVISION, e.NAME, p.count, e.LONGITUDE, e.LATITUDE
+from (select substr(RESIDENCEADMINDIVISION, 0, 4) as placeCode,
+             count(1)                             as count
+      from TBL_VIID_ZDR_PERSONDOC
+      where LONGITUDE is not null
+        and LATITUDE is not null
+      group by substr(RESIDENCEADMINDIVISION, 0, 4)) p
+         left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID
+
+select p.RESIDENCEADMINDIVISION, e.NAME, e.LONGITUDE, e.LATITUDE, p.count
+from (select RESIDENCEADMINDIVISION, count(1) as count
+      from TBL_VIID_ZDR_PERSONDOC
+      where substr(RESIDENCEADMINDIVISION, -2, 2) != '00'
+        and length(RESIDENCEADMINDIVISION) = '6'
+        and LONGITUDE is not null
+        and LATITUDE is not null
+      group by RESIDENCEADMINDIVISION) p
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;

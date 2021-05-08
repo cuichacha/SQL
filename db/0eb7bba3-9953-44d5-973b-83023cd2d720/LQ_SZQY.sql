@@ -171,6 +171,3 @@ from PEOPLE;
 
 insert into People (NUMID, RID, PROPERTY, JZFL, IS_DELETE, CUNIT)
 values (7305, 'r20200422001', '重点关注', '其他个人极端行为', 'N', '路北派出所');
-
-
-
