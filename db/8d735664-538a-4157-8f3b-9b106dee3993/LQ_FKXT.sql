@@ -26,8 +26,9 @@ group by trunc(CREATEDATE);
 
 
 
-select r.ROLENAME,
-       c.CNT,
+select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'GenderCode')                  as gender,
+         (select cnt from CODEDETAIL c where c.ID = a.KEYUNITID and c.TYPEID = 'KeyUnitAlarmType')                  as keyUnitAlarmType,
+       r.ROLENAME,
        a.ID,
        a.KEYUNITID,
        a.NAME,
@@ -50,7 +51,7 @@ select r.ROLENAME,
        a.DEALNOTES,
        a.CREATETOR
 from KEYUNIT_ALARM a
-         left join ROLEINFO r on a.KEYUNITID = r.ROLEID left join CODEDETAIL c on a.GENDERCODE = c.TYPEID
+         left join ROLEINFO r on a.KEYUNITID = r.ROLEID
 where a.CREATEDATE >= ''
   and a.CREATEDATE <= ''
 and a.KEYUNITID = ''

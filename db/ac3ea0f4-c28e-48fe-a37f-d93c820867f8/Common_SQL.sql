@@ -1340,5 +1340,46 @@ from (select substr(RESIDENCEADMINDIVISION, 0, 4) as placeCode, count(1) as coun
 
 
 
+select *
+from KEYUNIT_VISITOR;
+
+select *
+from CODEDETAIL
+where TYPEID like 'gender%';
+
+select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'GenderCode')      as gender,
+       (select cnt from CODEDETAIL c where c.ID = a.KEYUNITID and c.TYPEID = 'KeyUnitAlarmType') as keyUnitAlarmType,
+       r.ROLENAME,
+       a.ID,
+       a.KEYUNITID,
+       a.NAME,
+       a.CERTIFICATE,
+       a.GENDERCODE,
+       a.ADDRESS,
+       a.ALARMTYPE,
+       a.CERTIFICATEPHOTO,
+       a.PHOTO,
+       a.SIMILARITY,
+       a.PERSONMINORCATEGORIES,
+       a.CREATEDATE,
+       a.AREACODE,
+       a.AREANAME,
+       a.POLICE,
+       a.UPLOADDATE,
+       a.UPLOADSTATUS,
+       a.UPLOADMSG,
+       a.ISDEAL,
+       a.DEALNOTES,
+       a.CREATETOR
+from KEYUNIT_ALARM a
+         left join ROLEINFO r on a.KEYUNITID = r.ROLEID
+where  a.GENDERCODE = '1';
 
 
+select *
+from KEYUNIT_ALARM;
+
+update KEYUNIT_ALARM set PHOTO = (select SMALLIMAGEDATA from TBL_VIID_ZDR_FOOTPOINT where ID = '1100000000000220200103103214100012021041623020300000045') where ID = '20210508163245000001';
+
+select *
+from KEYUNIT_VISITOR;;

@@ -164,7 +164,7 @@ FROM (SELECT m.*, ROWNUM RN
                          where r.roleid = g.stationId
                            and r.fullpath like (select fullpath from roleinfo r2 where r2.roleid = ?) || '%')) m
       WHERE ROWNUM <= ?)
-WHERE RN > ?
+WHERE RN > ?;
 
 select *
 from PEOPLE;
