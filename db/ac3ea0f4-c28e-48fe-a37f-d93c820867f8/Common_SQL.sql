@@ -1345,7 +1345,7 @@ from KEYUNIT_VISITOR;
 
 select *
 from CODEDETAIL
-where TYPEID like 'gender%';
+where TYPEID like 'Gender%';
 
 select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'GenderCode')      as gender,
        (select cnt from CODEDETAIL c where c.ID = a.KEYUNITID and c.TYPEID = 'KeyUnitAlarmType') as keyUnitAlarmType,
@@ -1382,4 +1382,4 @@ from KEYUNIT_ALARM;
 update KEYUNIT_ALARM set PHOTO = (select SMALLIMAGEDATA from TBL_VIID_ZDR_FOOTPOINT where ID = '1100000000000220200103103214100012021041623020300000045') where ID = '20210508163245000001';
 
 select *
-from KEYUNIT_VISITOR;;
+from KEYUNIT_VISITOR;
