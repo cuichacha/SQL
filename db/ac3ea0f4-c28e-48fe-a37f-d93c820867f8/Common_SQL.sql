@@ -1373,13 +1373,120 @@ select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'G
        a.CREATETOR
 from KEYUNIT_ALARM a
          left join ROLEINFO r on a.KEYUNITID = r.ROLEID
-where  a.GENDERCODE = '1';
+where a.GENDERCODE = '1';
 
 
 select *
 from KEYUNIT_ALARM;
 
-update KEYUNIT_ALARM set PHOTO = (select SMALLIMAGEDATA from TBL_VIID_ZDR_FOOTPOINT where ID = '1100000000000220200103103214100012021041623020300000045') where ID = '20210508163245000001';
+update KEYUNIT_ALARM
+set PHOTO = (select SMALLIMAGEDATA
+             from TBL_VIID_ZDR_FOOTPOINT
+             where ID = '1100000000000220200103103214100012021041623020300000045')
+where ID = '20210508163245000001';
 
 select *
 from KEYUNIT_VISITOR;
+
+select *
+from CODEDETAIL
+where TYPEID = 'EthicCode'
+  and CNT = '汉族';
+
+select *
+from KEYUNIT
+where UNITNAME = '';
+
+select *
+from DEPARTMENT
+where DEPARTNAME = '';
+
+select distinct (select ID
+                 from CODEDETAIL
+                 where TYPEID = 'EthicCode'
+                   and CNT = '汉族')      as ethnicity,
+                (select UNITCODE
+                 from KEYUNIT
+                 where UNITNAME = '')   as unit,
+                (select DEPARTCODE
+                 from DEPARTMENT
+                 where DEPARTNAME = '') as department
+from KEYUNIT;
+
+select count(1)
+from KEYUNIT_VISITOR
+where STATUS = 1
+  and KEYUNITID = '200100200000012001';
+
+select *
+from KEYUNIT_VISITOR;
+
+select ID
+from KEYUNIT
+where FULLPATH like '1%'
+   or ID = '1';
+
+select FULLPATH
+from KEYUNIT
+where ID = '2002';
+
+select *
+from KEYUNIT_ALARM
+where KEYUNITID in (select ID
+                    from KEYUNIT
+                    where FULLPATH like '200100200000012001$2002%');
+
+select FULLPATH
+from KEYUNIT
+where ID = '2002';
+
+select ID
+from KEYUNIT
+where FULLPATH like '200100200000012001$2002%';
+
+select *
+from KEYUNIT_ALARM a
+where exists(select 1
+             from KEYUNIT k1
+             where k1.ID = a.KEYUNITID
+               and k1.FULLPATH like (select FULLPATH from KEYUNIT k2 where k2.ID = '2002') || '%');
+
+SELECT *
+FROM (SELECT m.*, ROWNUM RN
+      FROM (select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'GenderCode')      as gender,
+                   (select cnt
+                    from CODEDETAIL c
+                    where c.ID = a.KEYUNITID
+                      and c.TYPEID = 'KeyUnitAlarmType')                                                     as keyUnitAlarmType,
+                   r.ROLENAME,
+                   a.ID,
+                   a.KEYUNITID,
+                   a.NAME,
+                   a.CERTIFICATE,
+                   a.GENDERCODE,
+                   a.ADDRESS,
+                   a.ALARMTYPE,
+                   a.CERTIFICATEPHOTO,
+                   a.PHOTO,
+                   a.SIMILARITY,
+                   a.PERSONMINORCATEGORIES,
+                   a.CREATEDATE,
+                   a.AREACODE,
+                   a.AREANAME,
+                   a.POLICE,
+                   a.UPLOADDATE,
+                   a.UPLOADSTATUS,
+                   a.UPLOADMSG,
+                   a.ISDEAL,
+                   a.DEALNOTES,
+                   a.CREATETOR
+            from KEYUNIT_ALARM a
+                     left join ROLEINFO r on a.KEYUNITID = r.ROLEID
+            WHERE a.CREATEDATE >= to_date('2021-05-06 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+              and a.CREATEDATE <= to_date('2021-05-13 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+              and exists(select 1
+                         from KEYUNIT k1
+                         where k1.ID = a.KEYUNITID
+                           and k1.FULLPATH like (select FULLPATH from KEYUNIT k2 where k2.ID = '200100200000012001') || '%')) m
+      WHERE ROWNUM <= 20)
+WHERE RN > 0;
