@@ -1453,4 +1453,122 @@ from KEYUNIT
 where AREACODE = '200000200000011035';
 
 select ROLEID
-from ROLEINFO where ROLENAME = '';
+from ROLEINFO
+where ROLENAME = '';
+
+
+select count(1) as count, k2.ID
+from KEYUNIT_VISITOR v1
+         left join (select k1.ID
+                    from KEYUNIT k1
+                    where exists(select 1
+                                 from ROLEINFO r1
+                                 where k1.AREACODE = r1.ROLEID
+                                   and r1.FULLPATH like
+                                       (select r2.FULLPATH from ROLEINFO r2 where r2.ROLEID = '') || '%')) k2
+                   on v1.KEYUNITID = k2.ID
+where v1.CREATEDATE >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+  and v1.CREATEDATE <= to_date('2022-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+group by k2.ID;
+
+select k3.UNITNAME, nvl(v2.count, 0) as count
+from KEYUNIT k3
+         left join (select count(1) as count, k2.ID
+                    from KEYUNIT_VISITOR v1
+                             left join (select k1.ID
+                                        from KEYUNIT k1
+                                        where exists(select 1
+                                                     from ROLEINFO r1
+                                                     where k1.AREACODE = r1.ROLEID
+                                                       and r1.FULLPATH like
+                                                           (select r2.FULLPATH
+                                                            from ROLEINFO r2
+                                                            where r2.ROLEID = '203207200000011023') || '%')) k2
+                                       on v1.KEYUNITID = k2.ID
+                    where v1.CREATEDATE >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+                      and v1.CREATEDATE <= to_date('2022-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+                    group by k2.ID) v2 on v2.ID = k3.ID;
+
+select nvl(v.parentid, '')           as parent,
+       nvl(v.roleid, '')             as id,
+       v.rolename                    as name,
+       (select count(*)
+        from RoleInfo t
+        where t.PARENTID = v.ROLEID) as childrenCount
+from RoleInfo v
+where v.DFKCODE like '3304%';
+
+
+
+select nvl(v.parentid, '')           as parent,
+       nvl(v.roleid, '')             as id,
+       v.rolename                    as name,
+       (select count(*)
+        from RoleInfo t,
+             KEYUNIT k
+        where t.PARENTID = v.ROLEID
+           or t.ROLEID = k.PARENTID) as childrenCount
+from RoleInfo v
+union
+select PARENTID                                                    as parent,
+       ID                                                          as id,
+       UNITNAME                                                    as name,
+       (select COUNT(*) from KEYUNIT k1 where k1.PARENTID = k2.ID) as childrenCount
+from KEYUNIT k2;
+
+select s.parent, s.id, s.name, s.childrenCount
+from (select nvl(v.parentid, '')           as parent,
+             nvl(v.roleid, '')             as id,
+             v.rolename                    as name,
+             (select count(*)
+              from RoleInfo t,
+                   KEYUNIT k
+              where t.PARENTID = v.ROLEID
+                 or t.ROLEID = k.PARENTID) as childrenCount
+      from RoleInfo v
+      union
+      select nvl(k2.parentid, '')                                        as parent,
+             nvl(k2.id, '')                                              as id,
+             k2.unitname                                                 as name,
+             (select COUNT(*) from KEYUNIT k1 where k1.PARENTID = k2.ID) as childrenCount
+      from KEYUNIT k2) s;
+
+select s.parent, id, name, childrenCount
+from (select nvl(v.parentid, '')                                      as parent,
+             nvl(v.roleid, '')                                        as id,
+             v.rolename                                               as name,
+             ((select count(*)
+                   from KEYUNIT k
+                   where k.AREACODE = v.ROLEID) + (select count(*)
+                   from RoleInfo t
+                   where t.PARENTID = v.ROLEID)) as childrenCount
+      from RoleInfo v where v.DFKCODE like '3304%'
+      union
+      select nvl(k2.AREACODE, '')                                        as parent,
+             nvl(k2.id, '')                                              as id,
+             k2.unitname                                                 as name,
+             (select COUNT(*) from KEYUNIT k1 where k1.AREACODE = k2.ID) as childrenCount
+      from KEYUNIT k2) s;
+
+
+select count(1)
+              from ROLEINFO r2 where r2.FULLPATH like (select substr(k.FULLPATH, 0, instr(k.FULLPATH, '$') - 1) as path
+from KEYUNIT k
+         inner join ROLEINFO r1 on k.PARENTID = r1.ROLEID) || '%';
+
+select substr(k.FULLPATH, -(length(k.ID)), length(k.ID)) as path
+from KEYUNIT k
+         inner join ROLEINFO r1 on k.PARENTID = r1.ROLEID;
+
+select *
+from ROLEINFO r2,
+     (select k.FULLPATH, k.ID, substr(k.FULLPATH, 0, length(k.FULLPATH) - length(k.ID) - 1) as path
+      from KEYUNIT k
+               inner join ROLEINFO r1 on k.PARENTID = r1.ROLEID) t
+where r2.FULLPATH like '%' || t.path || '%';
+
+select FULLPATH, substr(FULLPATH, 0, instr(FULLPATH, '$') - 1)
+from ROLEINFO
+where FULLPATH like '%203207200000011023';
+
+
