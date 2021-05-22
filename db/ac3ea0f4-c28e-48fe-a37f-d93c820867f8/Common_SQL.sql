@@ -1542,13 +1542,13 @@ from (select nvl(v.parentid, '')                                      as parent,
                    where k.AREACODE = v.ROLEID) + (select count(*)
                    from RoleInfo t
                    where t.PARENTID = v.ROLEID)) as childrenCount
-      from RoleInfo v where v.DFKCODE like '3304%'
+      from RoleInfo v where v.PARENTID = '330000000000000001'
       union
       select nvl(k2.AREACODE, '')                                        as parent,
              nvl(k2.id, '')                                              as id,
              k2.unitname                                                 as name,
              (select COUNT(*) from KEYUNIT k1 where k1.AREACODE = k2.ID) as childrenCount
-      from KEYUNIT k2) s;
+      from KEYUNIT k2 where k2.AREACODE = '330000000000000001') s;
 
 
 select count(1)
@@ -1571,4 +1571,28 @@ select FULLPATH, substr(FULLPATH, 0, instr(FULLPATH, '$') - 1)
 from ROLEINFO
 where FULLPATH like '%203207200000011023';
 
+select *
+from ROLEINFO where ROLEID = '200000200000011035';
+
+select *
+from GEUSERDOM where ROLEID = '200000200000011035';
+
+select *
+from KEYUNIT where ID = '';
+
+select *
+from ROLEINFO where ROLEID = '200000200000011052';
+
+select ROLEID
+from ROLEINFO where FULLPATH like (select FULLPATH
+from ROLEINFO where ROLEID = '200000200000011052') || '%';
+
+select ID
+from KEYUNIT where AREACODE in ('200000200000011052');
+
+select *
+from CODEDETAIL where TYPEID = 'warnAlarmTypeMinor';
+
+select *
+from ATTENDANCE where CERTIFICATE = '341125199707141994' and trunc(CREATETIME) = trunc(sysdate) and OFFTIME is null;
 
