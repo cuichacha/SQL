@@ -1151,7 +1151,7 @@ from (select b2.GZJB                  as togetherAttentionLevel,
               and f2.SHOTTIME >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
               and f2.SHOTTIME <= to_date('2021-09-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
               and f2.DEVICEID = f1.DEVICEID
-              and f1.IDNUMBER = '619932198612070920'
+              and f1.IDNUMBER = '619932198612070916'
               and f1.SHOTTIME >= (f2.SHOTTIME + INTERVAL '-5' SECOND)
               and f1.SHOTTIME <= (f2.SHOTTIME + INTERVAL '5' SECOND)
                left join TBL_VIID_ZDR_BASICINFO b1 on b1.ZDRID = f1.ZDRID
@@ -1534,27 +1534,30 @@ from (select nvl(v.parentid, '')           as parent,
       from KEYUNIT k2) s;
 
 select s.parent, id, name, childrenCount
-from (select nvl(v.parentid, '')                                      as parent,
-             nvl(v.roleid, '')                                        as id,
-             v.rolename                                               as name,
+from (select nvl(v.parentid, '')                                             as parent,
+             nvl(v.roleid, '')                                               as id,
+             v.rolename                                                      as name,
              ((select count(*)
-                   from KEYUNIT k
-                   where k.AREACODE = v.ROLEID) + (select count(*)
-                   from RoleInfo t
-                   where t.PARENTID = v.ROLEID)) as childrenCount
-      from RoleInfo v where v.PARENTID = '330000000000000001'
+               from KEYUNIT k
+               where k.AREACODE = v.ROLEID) + (select count(*)
+                                               from RoleInfo t
+                                               where t.PARENTID = v.ROLEID)) as childrenCount
+      from RoleInfo v
+      where v.PARENTID = '330000000000000001'
       union
       select nvl(k2.AREACODE, '')                                        as parent,
              nvl(k2.id, '')                                              as id,
              k2.unitname                                                 as name,
              (select COUNT(*) from KEYUNIT k1 where k1.AREACODE = k2.ID) as childrenCount
-      from KEYUNIT k2 where k2.AREACODE = '330000000000000001') s;
+      from KEYUNIT k2
+      where k2.AREACODE = '330000000000000001') s;
 
 
 select count(1)
-              from ROLEINFO r2 where r2.FULLPATH like (select substr(k.FULLPATH, 0, instr(k.FULLPATH, '$') - 1) as path
-from KEYUNIT k
-         inner join ROLEINFO r1 on k.PARENTID = r1.ROLEID) || '%';
+from ROLEINFO r2
+where r2.FULLPATH like (select substr(k.FULLPATH, 0, instr(k.FULLPATH, '$') - 1) as path
+                        from KEYUNIT k
+                                 inner join ROLEINFO r1 on k.PARENTID = r1.ROLEID) || '%';
 
 select substr(k.FULLPATH, -(length(k.ID)), length(k.ID)) as path
 from KEYUNIT k
@@ -1572,27 +1575,174 @@ from ROLEINFO
 where FULLPATH like '%203207200000011023';
 
 select *
-from ROLEINFO where ROLEID = '200000200000011035';
+from ROLEINFO
+where ROLEID = '200000200000011035';
 
 select *
-from GEUSERDOM where ROLEID = '200000200000011035';
+from GEUSERDOM
+where ROLEID = '200000200000011035';
 
 select *
-from KEYUNIT where ID = '';
+from KEYUNIT
+where ID = '';
 
 select *
-from ROLEINFO where ROLEID = '200000200000011052';
+from ROLEINFO
+where ROLEID = '200000200000011052';
 
 select ROLEID
-from ROLEINFO where FULLPATH like (select FULLPATH
-from ROLEINFO where ROLEID = '200000200000011052') || '%';
+from ROLEINFO
+where FULLPATH like (select FULLPATH
+                     from ROLEINFO
+                     where ROLEID = '200000200000011052') || '%';
 
 select ID
-from KEYUNIT where AREACODE in ('200000200000011052');
+from KEYUNIT
+where AREACODE in ('200000200000011052');
 
 select *
-from CODEDETAIL where TYPEID = 'warnAlarmTypeMinor';
+from CODEDETAIL
+where TYPEID = 'warnAlarmTypeMinor';
 
 select *
-from ATTENDANCE where CERTIFICATE = '341125199707141994' and trunc(CREATETIME) = trunc(sysdate) and OFFTIME is null;
+from ATTENDANCE
+where CERTIFICATE = '341125199707141994'
+  and trunc(CREATETIME) = trunc(sysdate)
+  and OFFTIME is null;
+
+select *
+from ROLEINFO
+where ROLENAME like '%第三%';
+
+select *
+from ROLEINFO
+where ROLEID = '200000200000011195';
+
+select *
+from KEYUNIT_ALARM
+where KEYUNITID in (select ROLEID
+                    from ROLEINFO
+                    where FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%');
+
+select *
+from KEYUNIT_ALARM a
+where exists(select 1
+             from ROLEINFO r
+             where a.KEYUNITID = r.ROLEID
+               and r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%');
+
+select *
+from ROLEINFO
+where FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%'
+  and ROLEID != '200000200000011052';
+
+select r.ROLEID,
+       r.ROLENAME,
+       r.PARENTID,
+       k.UNITCODE,
+       k.UNITTYPE,
+       (select ROLENAME from ROLEINFO i where i.ROLEID = r.PARENTID) as areaName
+from ROLEINFO r
+         left join KEYUNIT k on r.ROLEID = k.ID
+where r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%'
+  and r.ROLETYPE = 5
+  and r.ROLEID != '200000200000011052';
+
+select *
+from KEYUNIT;
+
+select (select cnt from CODEDETAIL c where c.ID = t.togetherPeopleType and c.TYPEID = 'RKLX')     as
+                                                                                                     togetherPeopleTypeName,
+       (select cnt from CODEDETAIL c where c.ID = t.peopleType and c.TYPEID = 'RKLX')             as peopleTypeName,
+       (select cnt from CODEDETAIL c where c.ID = t.togetherAttentionLevel and c.TYPEID = 'GZJB') as
+                                                                                                     togetherAttentionLevelName,
+       (select cnt from CODEDETAIL c where c.ID = t.peopleAttentionLevel and c.TYPEID = 'GZJB')   as
+                                                                                                     peopleAttentionLevelName,
+       t.*
+from (select b2.GZJB                  as togetherAttentionLevel,
+             b2.RKLX                  as togetherPeopleType,
+             b2.XP                    as togetherPeoplePhoto,
+             f2.ID                    as togetherId,
+             f2.TRIGGERTIME           as togetherTriggerTime,
+             f2.RXSFYQID              as togetherRxsfyqId,
+             f2.ZDRID                 as togetherDocId,
+             f2.NAME                  as togetherName,
+             f2.IDNUMBER              as togetherIdNumber,
+             f2.ZDRLAB                as togetherZdrLab,
+             f2.GKSY                  as togetherGksy,
+             f2.ZDR_IMAGEDATA         as togetherZdrImageData,
+             f2.ZDR_STORAGEPATH       as togetherPhotoUrl,
+             f2.DEVICEID              as togetherDeviceId,
+             f2.DEVICENAME            as togetherDeviceName,
+             f2.PLACECODE             as togetherPlaceCode,
+             f2.PLACECODENAME         as togetherPlaceCodeName,
+             f2.SIMILARITYDEGREE      as togetherSimilarityDegeree,
+             f2.SHOTTIME              as togetherAlarmTime,
+             f2.SMALLIMAGEID          as togetherSmallImageId,
+             f2.SMALLIMAGEDATA        as togetherSmallImageData,
+             f2.SMALLIMAGESTORAGEPATH as togetherFaceUrl,
+             f2.BIGIMAGEID            as togetherBigImageId,
+             f2.BIGIMAGEDATA          as togetherBigImageData,
+             f2.BIGIMAGESTORAGEPATH   as togetherSenseUrl,
+             f2.DISPOSITIONID         as togetherDispositonId,
+             f2.TITLE                 as togetherTitle,
+             f2.ALARMID               as togetherAlarmId,
+             f2.ISPUSH                as togetherIsPush,
+             f2.FACEID                as togetherFaceId,
+             f2.NOTIFICATIONID        as togetherNotificationId,
+             f2.LONGITUDE             as togetherLongtitude,
+             f2.LATITUDE              as togetherLatitude,
+             f2.VIIDSERVERID          as togetherViidServerId,
+             b1.GZJB                  as peopleAttentionLevel,
+             b1.RKLX                  as peopleType,
+             b1.XP                    as peoplePhoto,
+             f1.ID                    as id,
+             f1.TRIGGERTIME           as triggerTime,
+             f1.RXSFYQID              as rxsfyqId,
+             f1.ZDRID                 as docId,
+             f1.NAME                  as name,
+             f1.IDNUMBER              as idNumber,
+             f1.ZDRLAB                as zdrLab,
+             f1.GKSY                  as gksy,
+             f1.ZDR_IMAGEDATA         as zdrImageData,
+             f1.ZDR_STORAGEPATH       as photoUrl,
+             f1.DEVICEID              as deviceId,
+             f1.DEVICENAME            as deviceName,
+             f1.PLACECODE             as placeCode,
+             f1.PLACECODENAME         as placeCodeName,
+             f1.SIMILARITYDEGREE      as similarityDegeree,
+             f1.SHOTTIME              as alarmTime,
+             f1.SMALLIMAGEID          as smallImageId,
+             f1.SMALLIMAGEDATA        as smallImageData,
+             f1.SMALLIMAGESTORAGEPATH as faceUrl,
+             f1.BIGIMAGEID            as bigImageId,
+             f1.BIGIMAGEDATA          as bigImageData,
+             f1.BIGIMAGESTORAGEPATH   as senseUrl,
+             f1.DISPOSITIONID         as dispositonId,
+             f1.TITLE                 as title,
+             f1.ALARMID               as alarmId,
+             f1.ISPUSH                as isPush,
+             f1.FACEID                as faceId,
+             f1.NOTIFICATIONID        as notificationId,
+             f1.LONGITUDE             as longtitude,
+             f1.LATITUDE              as latitude,
+             f1.VIIDSERVERID          as viidServerId
+      from (select *
+            from TBL_VIID_ZDR_FOOTPOINT t1
+            where t1.SHOTTIME >= to_date('2021-05-09 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+              and t1.SHOTTIME <= to_date('2021-05-09 23:00:00', 'yyyy-mm-dd hh24:mi:ss')
+              and t1.IDNUMBER = '619932198612070921') f1
+               inner join (select *
+                           from TBL_VIID_ZDR_FOOTPOINT t2
+                           where t2.SHOTTIME >= to_date('2021-05-09 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+                             and t2.SHOTTIME <= to_date('2021-05-09 23:00:00', 'yyyy-mm-dd hh24:mi:ss')) f2 on
+              f2.ZDRID != f1.ZDRID
+              and f1.IDNUMBER != f2.IDNUMBER
+              and f2.DEVICEID = f1.DEVICEID
+              and f1.SHOTTIME >= (f2.SHOTTIME + INTERVAL '-5' SECOND)
+              and f1.SHOTTIME <= (f2.SHOTTIME + INTERVAL '5' SECOND)
+               left join TBL_VIID_ZDR_BASICINFO b1 on b1.ZDRID = f1.ZDRID
+               left join TBL_VIID_ZDR_BASICINFO b2 on b2.ZDRID = f2.ZDRID) t;
+
+
 
