@@ -1473,21 +1473,21 @@ group by k2.ID;
 
 select k3.UNITNAME, nvl(v2.count, 0) as count
 from KEYUNIT k3
-         left join (select count(1) as count, k2.ID
-                    from KEYUNIT_VISITOR v1
-                             left join (select k1.ID
-                                        from KEYUNIT k1
-                                        where exists(select 1
-                                                     from ROLEINFO r1
-                                                     where k1.AREACODE = r1.ROLEID
-                                                       and r1.FULLPATH like
-                                                           (select r2.FULLPATH
-                                                            from ROLEINFO r2
-                                                            where r2.ROLEID = '203207200000011023') || '%')) k2
-                                       on v1.KEYUNITID = k2.ID
-                    where v1.CREATEDATE >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
-                      and v1.CREATEDATE <= to_date('2022-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
-                    group by k2.ID) v2 on v2.ID = k3.ID;
+         inner join (select count(1) as count, k2.ID
+                     from KEYUNIT_VISITOR v1
+                              inner join (select k1.ID
+                                          from KEYUNIT k1
+                                          where exists(select 1
+                                                       from ROLEINFO r1
+                                                       where k1.AREACODE = r1.ROLEID
+                                                         and r1.FULLPATH like
+                                                             (select r2.FULLPATH
+                                                              from ROLEINFO r2
+                                                              where r2.ROLEID = '200000200000011035') || '%')) k2
+                                         on v1.KEYUNITID = k2.ID
+                     where v1.CREATEDATE >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+                       and v1.CREATEDATE <= to_date('2022-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+                     group by k2.ID) v2 on v2.ID = k3.ID;
 
 select nvl(v.parentid, '')           as parent,
        nvl(v.roleid, '')             as id,
@@ -1632,6 +1632,14 @@ where exists(select 1
                and r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%');
 
 select *
+from KEYUNIT_ALARM a
+         left join KEYUNIT k on a.KEYUNITID = k.ID
+where exists(select 1
+             from ROLEINFO r
+             where k.UNITCODE = r.DFKCODE
+               and r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011196') || '%');
+
+select *
 from ROLEINFO
 where FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011052') || '%'
   and ROLEID != '200000200000011052';
@@ -1745,4 +1753,43 @@ from (select b2.GZJB                  as togetherAttentionLevel,
                left join TBL_VIID_ZDR_BASICINFO b2 on b2.ZDRID = f2.ZDRID) t;
 
 
+select DEPARTCODE, DEPARTNAME
+from DEPARTMENT
+where UNITCODE = '';
+
+select *
+from CODEDETAIL
+where TYPEID like 'warnAlarmTypeMinor';
+
+
+select DEVICEID, trunc(SHOTTIME)
+from TBL_VIID_ZDR_FOOTPOINT
+where SHOTTIME <= trunc(sysdate)
+  and SHOTTIME >= trunc(sysdate) - 90;
+
+select *
+from TBL_VIID_ZDR_FOOTPOINT
+where trunc(SHOTTIME) = to_date('2021-05-06 00:00:00', 'yyyy-mm-dd hh24:mi:ss');
+
+select abs(round(to_number(f1.SHOTTIME - f2.SHOTTIME) * 24 * 60 * 60)) as followTime,
+       f1.ID                                                           as zdrFaceId,
+       f1.ZDRID                                                        as zdrId,
+       f1.IDNUMBER                                                     as zdrIdNumber,
+       f1.DEVICEID                                                     as zdrDeviceId,
+       f1.SHOTTIME                                                     as zdrShotTime,
+       f2.ID                                                           as followFaceId,
+       f2.ZDRID                                                        as followZdrId,
+       f2.IDNUMBER                                                     as followIdNumber,
+       f2.DEVICEID                                                     as followDeviceId,
+       f2.SHOTTIME                                                     as followShotTime
+from (select *
+      from TBL_VIID_ZDR_FOOTPOINT
+      where DEVICEID = '61030401001320000038'
+        and trunc(SHOTTIME) = to_date('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f1
+         inner join (select *
+                     from TBL_VIID_ZDR_FOOTPOINT
+                     where DEVICEID = '61030401001320000038'
+                       and trunc(SHOTTIME) = to_date('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f2
+                    on f1.DEVICEID = f2.DEVICEID and f1.ZDRID != f2.ZDRID and f1.IDNUMBER != f2.IDNUMBER
+where abs(round(to_number(f1.SHOTTIME - f2.SHOTTIME) * 24 * 60 * 60)) <= 20;
 
