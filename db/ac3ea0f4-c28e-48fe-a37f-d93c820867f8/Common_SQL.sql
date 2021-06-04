@@ -1829,9 +1829,8 @@ from (select substr(b.placecode, 0, 4) as placeCode,
 where p.placeCode is not null;
 
 select *
-from EQP_AREA where ID like '6199%';
-
-
+from EQP_AREA
+where ID like '6199%';
 
 select p.RESIDENCEADMINDIVISION, e.NAME, e.LONGITUDE, e.LATITUDE, p.count, p.RKLX, p.GZJB
 from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b.GZJB
@@ -1845,4 +1844,5 @@ from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b
          left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
 
 select *
-from EQP_AREA where ID = '610100';
+from EQP_AREA
+where ID = '610100';
