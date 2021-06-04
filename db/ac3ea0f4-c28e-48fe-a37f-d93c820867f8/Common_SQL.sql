@@ -1794,35 +1794,55 @@ from (select *
 where abs(round(to_number(f1.SHOTTIME - f2.SHOTTIME) * 24 * 60 * 60)) <= 20;
 
 select count(1)
-        from KEYUNIT_VISITOR v left join KEYUNIT k on v.KEYUNITID = k.ID
-        where trunc(v.CREATEDATE) = trunc(sysdate)
-          and exists(select 1
-            from ROLEINFO r
-                where k.UNITCODE = r.DFKCODE
-                and r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011088') || '%');
+from KEYUNIT_VISITOR v
+         left join KEYUNIT k on v.KEYUNITID = k.ID
+where trunc(v.CREATEDATE) = trunc(sysdate)
+  and exists(select 1
+             from ROLEINFO r
+             where k.UNITCODE = r.DFKCODE
+               and r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '200000200000011088') || '%');
 
 select k.ID, k.UNITNAME
-        from ROLEINFO r inner join KEYUNIT k on r.DfkCode = k.UnitCode
-        where r.FULLPATH like (select FULLPATH
-                             from ROLEINFO where ROLEID = '200000200000011088') || '%';
+from ROLEINFO r
+         inner join KEYUNIT k on r.DfkCode = k.UnitCode
+where r.FULLPATH like (select FULLPATH
+                       from ROLEINFO
+                       where ROLEID = '200000200000011088') || '%';
 
-select RPAD(p.placeCode, 6, '0') as RESIDENCEADMINDIVISION, e.NAME, p.count, e.LONGITUDE, e.LATITUDE
-        from (select substr(b.placecode, 0, 4) as placeCode,
-                     count(1) as count
-              from TBL_VIID_ZDR_PERSONDOC tp
-                left join tbl_viid_zdr_basicinfo b on tp.zdrid = b.zdrid
-              where LONGITUDE is not null
-                and LATITUDE is not null
-              group by substr(placecode, 0, 4)) p
-                 left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID;
+select RPAD(p.placeCode, 6, '0') as RESIDENCEADMINDIVISION,
+       e.NAME,
+       p.GZJB,
+       p.RKLX,
+       p.count,
+       e.LONGITUDE,
+       e.LATITUDE
+from (select substr(b.placecode, 0, 4) as placeCode,
+             count(1)                  as count,
+             b.RKLX,
+             b.GZJB
+      from TBL_VIID_ZDR_PERSONDOC tp
+               left join tbl_viid_zdr_basicinfo b on tp.zdrid = b.zdrid
+      where LONGITUDE is not null
+        and LATITUDE is not null
+      group by substr(placecode, 0, 4), b.RKLX, b.GZJB) p
+         left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID
+where p.placeCode is not null;
 
-select p.RESIDENCEADMINDIVISION, e.NAME, e.LONGITUDE, e.LATITUDE, p.count
-        from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count
-              from TBL_VIID_ZDR_PERSONDOC t left join TBL_VIID_ZDR_BASICINFO b on t.ZDRID = b.ZDRID
-              where substr(b.PLACECODE, -2, 2) != '00'
-                and length (b.PLACECODE) = '6'
-              and LONGITUDE is not null
-                and LATITUDE is not null
-              group by b.PLACECODE) p
-                 left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
+select *
+from EQP_AREA where ID like '6199%';
 
+
+
+select p.RESIDENCEADMINDIVISION, e.NAME, e.LONGITUDE, e.LATITUDE, p.count, p.RKLX, p.GZJB
+from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b.GZJB
+      from TBL_VIID_ZDR_PERSONDOC t
+               left join TBL_VIID_ZDR_BASICINFO b on t.ZDRID = b.ZDRID
+      where substr(b.PLACECODE, -2, 2) != '00'
+        and length(b.PLACECODE) = '6'
+        and LONGITUDE is not null
+        and LATITUDE is not null
+      group by b.PLACECODE, b.RKLX, b.GZJB) p
+         left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
+
+select *
+from EQP_AREA where ID = '610100';
