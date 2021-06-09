@@ -1846,3 +1846,15 @@ from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b
 select *
 from EQP_AREA
 where ID = '610100';
+
+select v.*, e.NAME as IdExt_txt
+from VIDEOINPUT v
+         left join EQP_AREA e on v.IDEXT = e.ID
+where v.GAT1400 = '';
+
+select *
+from TBL_VIID_ZDR_FOOTPOINT
+where ID = '110000000000022020010310321410001020201123103242';
+
+select *
+from CODEDETAIL where TYPEID like '%BusinessModel%';
