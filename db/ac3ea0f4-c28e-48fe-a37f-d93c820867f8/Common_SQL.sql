@@ -1857,4 +1857,5 @@ from TBL_VIID_ZDR_FOOTPOINT
 where ID = '110000000000022020010310321410001020201123103242';
 
 select *
-from CODEDETAIL where TYPEID like '%BusinessModel%';
+from CODEDETAIL
+where TYPEID like '%BusinessModel%';
