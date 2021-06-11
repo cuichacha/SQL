@@ -1845,7 +1845,7 @@ from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b
 
 select *
 from EQP_AREA
-where ID = '610100';
+where ID like '61%';
 
 select v.*, e.NAME as IdExt_txt
 from VIDEOINPUT v
@@ -1858,4 +1858,25 @@ where ID = '110000000000022020010310321410001020201123103242';
 
 select *
 from CODEDETAIL
-where TYPEID like '%BusinessModel%';
+where TYPEID like 'RKLX%';
+
+select name, sum(nvl(value, 0)) as value
+from (select M.name, n.value
+      from (select substr(id, 0, 4) as id, name from eqp_area where id like '61%' and id != '61') M
+               inner join (select placecode, count(1) as value from TBL_VIID_ZDR_BASICINFO group by placecode) N
+                          on n.placecode like M.id || '%')
+group by name
+order by value desc;
+
+select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID)
+from TBL_VIID_ZDR_BASICINFO b
+group by substr(b.PLACECODE, 0, 4);
+
+select m.NAME, nvl(t.count, 0) as value
+from (select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID) as count
+      from TBL_VIID_ZDR_BASICINFO b
+      group by substr(b.PLACECODE, 0, 4)) t
+         right join (select *
+                     from EQP_AREA e
+                     where rpad(e.PARENT, 6, 0) = rpad('61', 6, 0) order by e.ID) m on m.ID like t.placeCode || '%';
+
