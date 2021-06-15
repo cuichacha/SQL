@@ -1452,9 +1452,6 @@ select ID
 from KEYUNIT
 where AREACODE = '200000200000011035';
 
-select ROLEID
-from ROLEINFO
-where ROLENAME = '';
 
 
 select count(1) as count, k2.ID
