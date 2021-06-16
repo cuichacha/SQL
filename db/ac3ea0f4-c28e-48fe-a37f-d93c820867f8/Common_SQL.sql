@@ -1875,5 +1875,10 @@ from (select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID) as count
       group by substr(b.PLACECODE, 0, 4)) t
          right join (select *
                      from EQP_AREA e
-                     where rpad(e.PARENT, 6, 0) = rpad('61', 6, 0) order by e.ID) m on m.ID like t.placeCode || '%';
+                     where rpad(e.PARENT, 6, 0) = rpad('61', 6, 0)
+                     order by e.ID) m on m.ID like t.placeCode || '%';
 
+
+select *
+from CODEDETAIL
+where TYPEID like 'function%';
