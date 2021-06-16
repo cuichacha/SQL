@@ -90,9 +90,6 @@ select *
 from ROLEINFO
 where ROLEID = '330000000000000001';
 
-select *
-from ROLEINFO
-where ROLENAME like '路%';
 
 select ID,
        HEADLINE,
