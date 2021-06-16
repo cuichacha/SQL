@@ -1,0 +1,2 @@
+select *
+from TBL_VIID_ZDR_FOOTPOINT;
