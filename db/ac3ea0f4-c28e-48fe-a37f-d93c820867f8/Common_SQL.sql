@@ -1937,5 +1937,87 @@ select *
 from EQP_AREA
 where ID like '61%';
 
-select ROW_NUMBER() over (order by CREATETIME desc) as rank, b.*
+select RANK() over (order by CREATETIME desc) as rank, b.*
 from BUSINESS_OPERATELOG b;
+
+select *
+from (select RANK() over (order by CREATETIME desc) as rank, b.*
+      from BUSINESS_OPERATELOG b) t
+where t.ID = '20210618160906003156';
+
+select *
+from (select ROW_NUMBER() over (order by CREATETIME desc) as rank, b.*
+      from BUSINESS_OPERATELOG b) t
+where t.ID = '20210618160906003156';
+
+select EMAILADDR, sum(SCORE) as totalScore, trunc(CREATEDATE) as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin'
+  and trunc(CREATEDATE) >= trunc(sysdate, 'iw') - 7
+  and trunc(CREATEDATE) <= trunc(sysdate, 'iw') + 5
+group by EMAILADDR, trunc(CREATEDATE)
+order by trunc(CREATEDATE);
+
+select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210607
+  and COUNTDATE <= 20210618
+group by EMAILADDR, COUNTDATE
+order by COUNTDATE;
+
+select (t1.score + t2.score) as totalScore, t1.EMAILADDR, t1.score, t1.time, t2.EMAILADDR, t2.score, t2.time
+from (select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210607
+        and COUNTDATE <= 20210618
+      group by EMAILADDR, COUNTDATE
+      order by COUNTDATE) t1
+         left join (select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+                    from USERSCOREDETAIL
+                    where EMAILADDR = 'admin001@zjtek.com'
+                      and COUNTDATE >= 20210607
+                      and COUNTDATE <= 20210618
+                    group by EMAILADDR, COUNTDATE
+                    order by COUNTDATE) t2 on t1.EMAILADDR = t2.EMAILADDR
+where t1.time - t2.time = 7;
+
+select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210607
+  and COUNTDATE <= 20210613
+group by EMAILADDR, COUNTDATE
+union
+select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210614
+  and COUNTDATE <= 20210620
+group by EMAILADDR, COUNTDATE;
+
+select *
+from (select sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210607
+        and COUNTDATE <= 20210613
+      group by COUNTDATE
+      union
+      select sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210614
+        and COUNTDATE <= 20210620
+      group by COUNTDATE)
+order by time;
+
+select trunc(sysdate, 'iw') - 7 as time
+from dual
+union
+select trunc(sysdate, 'iw') - 6 as time
+from dual;
+
+
+
