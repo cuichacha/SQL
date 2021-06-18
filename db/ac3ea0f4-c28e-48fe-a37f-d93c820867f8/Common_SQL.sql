@@ -1879,3 +1879,63 @@ from (select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID) as count
 select *
 from CODEDETAIL
 where TYPEID like 'function%';
+
+select e.NAME as placeCodeName,
+       count(p.ZDRID)
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null
+  and substr(b.PLACECODE, 4, 1) = 3
+group by e.NAME;
+
+select PLACECODE, substr(PLACECODE, 4, 1)
+from TBL_VIID_ZDR_BASICINFO;
+
+select e.NAME, p.NAME, p.LONGITUDE, p.LATITUDE
+from TBL_VIID_ZDR_PERSONDOC p
+         left join TBL_VIID_ZDR_BASICINFO b on p.ZDRID = b.ZDRID
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LATITUDE is not null
+  and p.LONGITUDE is not null
+  and substr(b.PLACECODE, 4, 1) = 3;
+
+select e.NAME      as placeCodeName,
+       b.placeCode,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null;
+
+select *
+from EQP_AREA
+where NAME = '陈仓区';
+
+select e.NAME      as placeCodeName,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null
+  and p.LATITUDE = 34.3644;
+
+select *
+from EQP_AREA
+where ID like '61%';
+
+select ROW_NUMBER() over (order by CREATETIME desc) as rank, b.*
+from BUSINESS_OPERATELOG b;
