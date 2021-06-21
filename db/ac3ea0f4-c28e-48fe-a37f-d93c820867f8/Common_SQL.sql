@@ -1950,6 +1950,14 @@ from (select ROW_NUMBER() over (order by CREATETIME desc) as rank, b.*
       from BUSINESS_OPERATELOG b) t
 where t.ID = '20210618160906003156';
 
+select ROW_NUMBER() over (order by SCORE desc) as rank, s.*
+from USERSCORE s;
+
+select t.rank, t.SCORE
+from (select ROW_NUMBER() over (order by SCORE desc) as rank, s.*
+      from USERSCORE s) t
+where t.EMAILADDR = 'admin';
+
 select EMAILADDR, sum(SCORE) as totalScore, trunc(CREATEDATE) as time
 from USERSCOREDETAIL
 where EMAILADDR = 'admin'
@@ -1958,12 +1966,12 @@ where EMAILADDR = 'admin'
 group by EMAILADDR, trunc(CREATEDATE)
 order by trunc(CREATEDATE);
 
-select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+select sum(SCORE) as score, COUNTDATE as time
 from USERSCOREDETAIL
 where EMAILADDR = 'admin001@zjtek.com'
   and COUNTDATE >= 20210607
   and COUNTDATE <= 20210618
-group by EMAILADDR, COUNTDATE
+group by COUNTDATE
 order by COUNTDATE;
 
 select (t1.score + t2.score) as totalScore, t1.EMAILADDR, t1.score, t1.time, t2.EMAILADDR, t2.score, t2.time
