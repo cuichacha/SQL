@@ -90,9 +90,6 @@ select *
 from ROLEINFO
 where ROLEID = '330000000000000001';
 
-select *
-from ROLEINFO
-where ROLENAME like '路%';
 
 select ID,
        HEADLINE,
@@ -1875,5 +1872,160 @@ from (select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID) as count
       group by substr(b.PLACECODE, 0, 4)) t
          right join (select *
                      from EQP_AREA e
-                     where rpad(e.PARENT, 6, 0) = rpad('61', 6, 0) order by e.ID) m on m.ID like t.placeCode || '%';
+                     where rpad(e.PARENT, 6, 0) = rpad('61', 6, 0)
+                     order by e.ID) m on m.ID like t.placeCode || '%';
+
+
+select *
+from CODEDETAIL
+where TYPEID like 'function%';
+
+select e.NAME as placeCodeName,
+       count(p.ZDRID)
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null
+  and substr(b.PLACECODE, 4, 1) = 3
+group by e.NAME;
+
+select PLACECODE, substr(PLACECODE, 4, 1)
+from TBL_VIID_ZDR_BASICINFO;
+
+select e.NAME, p.NAME, p.LONGITUDE, p.LATITUDE
+from TBL_VIID_ZDR_PERSONDOC p
+         left join TBL_VIID_ZDR_BASICINFO b on p.ZDRID = b.ZDRID
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LATITUDE is not null
+  and p.LONGITUDE is not null
+  and substr(b.PLACECODE, 4, 1) = 3;
+
+select e.NAME      as placeCodeName,
+       b.placeCode,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null;
+
+select *
+from EQP_AREA
+where NAME = '陈仓区';
+
+select e.NAME      as placeCodeName,
+       p.ZDRID,
+       p.RESIDENCEADMINDIVISION,
+       p.SHOTTIME  as lastActiveTime,
+       p.LATITUDE  as lastActiveLatitude,
+       p.LONGITUDE as lastActiveLongitude,
+       p.DEVICEID  as lastActiveDeviceId
+from TBL_VIID_ZDR_PERSONDOC p
+         left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+         left join EQP_AREA e on rpad(b.placecode, 8, '0') = rpad(e.ID, 8, '0')
+where p.LONGITUDE is not null
+  and p.LATITUDE is not null
+  and p.LATITUDE = 34.3644;
+
+select *
+from EQP_AREA
+where ID like '61%';
+
+select RANK() over (order by CREATETIME desc) as rank, b.*
+from BUSINESS_OPERATELOG b;
+
+select *
+from (select RANK() over (order by CREATETIME desc) as rank, b.*
+      from BUSINESS_OPERATELOG b) t
+where t.ID = '20210618160906003156';
+
+select *
+from (select ROW_NUMBER() over (order by CREATETIME desc) as rank, b.*
+      from BUSINESS_OPERATELOG b) t
+where t.ID = '20210618160906003156';
+
+select ROW_NUMBER() over (order by SCORE desc) as rank, s.*
+from USERSCORE s;
+
+select t.rank, t.SCORE
+from (select ROW_NUMBER() over (order by SCORE desc) as rank, s.*
+      from USERSCORE s) t
+where t.EMAILADDR = 'admin';
+
+select EMAILADDR, sum(SCORE) as totalScore, trunc(CREATEDATE) as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin'
+  and trunc(CREATEDATE) >= trunc(sysdate, 'iw') - 7
+  and trunc(CREATEDATE) <= trunc(sysdate, 'iw') + 5
+group by EMAILADDR, trunc(CREATEDATE)
+order by trunc(CREATEDATE);
+
+select sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210607
+  and COUNTDATE <= 20210618
+group by COUNTDATE
+order by COUNTDATE;
+
+select (t1.score + t2.score) as totalScore, t1.EMAILADDR, t1.score, t1.time, t2.EMAILADDR, t2.score, t2.time
+from (select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210607
+        and COUNTDATE <= 20210618
+      group by EMAILADDR, COUNTDATE
+      order by COUNTDATE) t1
+         left join (select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+                    from USERSCOREDETAIL
+                    where EMAILADDR = 'admin001@zjtek.com'
+                      and COUNTDATE >= 20210607
+                      and COUNTDATE <= 20210618
+                    group by EMAILADDR, COUNTDATE
+                    order by COUNTDATE) t2 on t1.EMAILADDR = t2.EMAILADDR
+where t1.time - t2.time = 7;
+
+select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210607
+  and COUNTDATE <= 20210613
+group by EMAILADDR, COUNTDATE
+union
+select EMAILADDR, sum(SCORE) as score, COUNTDATE as time
+from USERSCOREDETAIL
+where EMAILADDR = 'admin001@zjtek.com'
+  and COUNTDATE >= 20210614
+  and COUNTDATE <= 20210620
+group by EMAILADDR, COUNTDATE;
+
+select *
+from (select sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210607
+        and COUNTDATE <= 20210613
+      group by COUNTDATE
+      union
+      select sum(SCORE) as score, COUNTDATE as time
+      from USERSCOREDETAIL
+      where EMAILADDR = 'admin001@zjtek.com'
+        and COUNTDATE >= 20210614
+        and COUNTDATE <= 20210620
+      group by COUNTDATE)
+order by time;
+
+select trunc(sysdate, 'iw') - 7 as time
+from dual
+union
+select trunc(sysdate, 'iw') - 6 as time
+from dual;
+
+
 
