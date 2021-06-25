@@ -1778,12 +1778,12 @@ select abs(round(to_number(f1.SHOTTIME - f2.SHOTTIME) * 24 * 60 * 60)) as follow
        f2.SHOTTIME                                                     as followShotTime
 from (select *
       from TBL_VIID_ZDR_FOOTPOINT
-      where DEVICEID = '61030401001320000038'
-        and trunc(SHOTTIME) = to_date('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f1
+      where DEVICEID = '61040352001310001503'
+        and trunc(SHOTTIME) = to_date('2021-06-08 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f1
          inner join (select *
                      from TBL_VIID_ZDR_FOOTPOINT
-                     where DEVICEID = '61030401001320000038'
-                       and trunc(SHOTTIME) = to_date('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f2
+                     where DEVICEID = '61040352001310001503'
+                       and trunc(SHOTTIME) = to_date('2021-06-08 00:00:00', 'yyyy-mm-dd hh24:mi:ss')) f2
                     on f1.DEVICEID = f2.DEVICEID and f1.ZDRID != f2.ZDRID and f1.IDNUMBER != f2.IDNUMBER
 where abs(round(to_number(f1.SHOTTIME - f2.SHOTTIME) * 24 * 60 * 60)) <= 20;
 
@@ -2027,5 +2027,65 @@ union
 select trunc(sysdate, 'iw') - 6 as time
 from dual;
 
+select trunc(sysdate) - 1, trunc(sysdate) - 1 + 23.9998 / 24
+from dual;
 
+select *
+from TBL_VIID_ZDR_FOOTPOINT
+where SHOTTIME between trunc(sysdate) and trunc(sysdate) + 23.9998 / 24;
 
+select t.*, b.XP as zdrImageData, b.RKLX as peopleType
+from TBL_VIID_ZDR_TXR t
+         left join TBL_VIID_ZDR_FOOTPOINT f on t.FACEID = f.ID
+         left join TBL_VIID_ZDR_BASICINFO b on t.ZDRID = b.ZDRID
+where t.SHOTTIME between sysdate - 100 and sysdate
+  and t.ZDRID = '';
+
+select (select cnt from CODEDETAIL c where c.ID = b.RKLX and c.TYPEID = 'RKLX')
+                               as togetherPeopleTypeName,
+       (select cnt from CODEDETAIL c where c.ID = z.peopleType and c.TYPEID = 'RKLX')
+                               as peopleTypeName,
+       z.ID,
+       z.ZDRID                 as docId,
+       z.IDNUMBER              as idNumber,
+       z.DEVICEID,
+       z.SHOTTIME,
+       z.FACEID,
+       z.FOLLOWZDRID           as togetherDocId,
+       z.FOLLOWIDNUMBER        as togetherIdNumber,
+       z.FOLLOWSHOTTIME,
+       z.FOLLOWTIME,
+       z.FOLLOWFACEID,
+       z.peoplePhoto,
+       z.peopleType,
+       z.SMALLIMAGEDATA,
+       z.faceUrl,
+       z.BIGIMAGEDATA,
+       z.senseUrl,
+       z.DEVICENAME,
+       z.XM                    as name,
+       b.XP                    as togetherPeoplePhoto,
+       b.RKLX                  as togetherPropleType,
+       b.XM                    as togetherName,
+       f.BIGIMAGEDATA          as togetherBigImageData,
+       f.SMALLIMAGEDATA        as togetherSmallImageData,
+       f.BIGIMAGESTORAGEPATH   as togetherSenseUrl,
+       f.SMALLIMAGESTORAGEPATH as togetherFaceUrl
+from (select t1.*,
+             b.XP                    as peoplePhoto,
+             b.RKLX                  as peopleType,
+             b.XM,
+             f.SMALLIMAGEDATA,
+             f.SMALLIMAGESTORAGEPATH as faceUrl,
+             f.BIGIMAGEDATA,
+             f.BIGIMAGESTORAGEPATH   as senseUrl,
+             f.DEVICENAME
+      from TBL_VIID_ZDR_TXR t1
+               left join TBL_VIID_ZDR_FOOTPOINT f on t1.FACEID = f.ID
+               left join TBL_VIID_ZDR_BASICINFO b on t1.ZDRID = b.ZDRID
+      where t1.SHOTTIME between to_date('2021-06-07 00:00:00', 'yyyy-mm-dd hh24:mi:ss') and to_date('2021-06-09 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+        and t1.ZDRID = ''
+        and t1.IDNUMBER = ''
+        and b.XM like '%%') z
+         left join TBL_VIID_ZDR_FOOTPOINT f on z.FOLLOWFACEID = f.ID
+         left join TBL_VIID_ZDR_BASICINFO b on z.FOLLOWZDRID = b.ZDRID;
