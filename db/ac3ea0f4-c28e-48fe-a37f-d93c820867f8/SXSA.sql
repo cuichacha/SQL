@@ -312,7 +312,7 @@ from (select Y.*, decode(y.cjs, 0, 0, (round(y.lrjs / y.cjs, 4)) * 100) lrjsl
                                               and I.FULLPATH LIKE
                                                   (SELECT FULLPATH FROM ROLEINFO WHERE ROLEID = '330000000000481001') || '%'
                                               and C.ESTABLISHDATE >=
-                                                  TO_DATE('2021-01-01 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
+                                                  TO_DATE('2021-05-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
                                               and C.ESTABLISHDATE <=
                                                   TO_DATE('2021-06-20 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
                                               and C.CASESOURCE = '案件倒查') C
@@ -365,8 +365,8 @@ from (select Y.*, decode(y.cjs, 0, 0, (round(y.lrjs / y.cjs, 4)) * 100) lrjsl
                                                      (SELECT C.CODE FROM CODE_AJLB C WHERE C.CODE = T.AJLBDM)      CODELEV2
                                               FROM TB_ST_ASJ T
                                               WHERE 1 = 1
-                                                AND LARQ >= TO_DATE('2021-01-01 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
-                                                AND LARQ <= TO_DATE('2021-06-20 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
+                                                AND LARQ >= TO_DATE('2021-05-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+                                                AND LARQ <= TO_DATE('2021-06-25 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
                                                 and LADW_GAJGJGDM in (select code
                                                                       from code_gxs ri
                                                                       where ri.code =
@@ -394,4 +394,49 @@ from CASEINFO
 where ESTABLISHDATE between TO_DATE('2021-06-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS') and TO_DATE('2021-06-01 23:59:59', 'YYYY-MM-DD HH24:MI:SS');
 
 select ESTABLISHDATE
-from CASEINFO where CASEID = '330602010000210625095947947389';
+from CASEINFO
+where CASEID = '330602010000210625095947947389';
+
+WHERE C.ISDELETE = 0
+                                              AND C.CASESTATUS <> 3
+                                              AND I.ISTREESHOW = 1
+                                              AND (CASEINFOSTATUSCODE is null or CASEINFOSTATUSCODE <> '0500');
+
+update CASEINFO
+set ISDELETE           = 0,
+    CASESTATUS         = 1,
+    CASEINFOSTATUSCODE = null,
+    CREATEDEPT         = '330000000000481388',
+    CASESOURCE         = '案件倒查'
+where CASEID = '330602010000210625095947947389';
+
+select CREATEDEPT
+from CASEINFO
+where CASEID = '330600000000200313154112446154';
+
+update CASEINFO
+set ISDELETE           = 0,
+    CASESTATUS         = 1,
+    CASEINFOSTATUSCODE = null,
+    CREATEDEPT         = '330000000000481388',
+    CASESOURCE         = '案件倒查'
+where CASEID = '330602010000210625090113671371';
+
+select ROLENAME, ISTREESHOW
+from ROLEINFO
+where PARENTID = '330000000000481026';
+
+SELECT C.*, I.FULLPATH
+FROM CASEINFO C
+         LEFT JOIN ROLEINFO I ON C.CREATEDEPT = I.ROLEID
+where i.FULLPATH like (SELECT FULLPATH FROM ROLEINFO WHERE ROLEID = '330000000000481001') || '%';
+
+
+select DFKCODE
+from ROLEINFO where ROLEID = '330000000000481014';
+
+select *
+from TB_ST_ASJ;
+
+update TB_ST_ASJ
+set LADW_GAJGJGDM = '330697000000';
