@@ -228,7 +228,7 @@ from (select roleid, rolename, parentid, fullpath, sortid, dfkcode
                                    when c.securitylevel = 1 and (sysdate - c.createdate) - nvL(c.securitydays, 7) > 0
                                        then 1
                                    else 0 end)                                                                as bmygk,
-                           sum(case when c.securitylevel = 1 then 1else 0 end)                                as bm,
+                           sum(case when c.securitylevel = 1 then 1 else 0 end)                               as bm,
                            sum(case when securitylevel = 2 then 1 else 0 end)                                 as jm,
                            sum(case when clearlevel = 0 then 1 else 0 end)                                    as qxwykb,
                            sum(case when clearlevel = 1 then 1 else 0 end)                                    as qxwybkb,
@@ -397,11 +397,6 @@ select ESTABLISHDATE
 from CASEINFO
 where CASEID = '330602010000210625095947947389';
 
-WHERE C.ISDELETE = 0
-                                              AND C.CASESTATUS <> 3
-                                              AND I.ISTREESHOW = 1
-                                              AND (CASEINFOSTATUSCODE is null or CASEINFOSTATUSCODE <> '0500');
-
 update CASEINFO
 set ISDELETE           = 0,
     CASESTATUS         = 1,
@@ -433,10 +428,239 @@ where i.FULLPATH like (SELECT FULLPATH FROM ROLEINFO WHERE ROLEID = '33000000000
 
 
 select DFKCODE
-from ROLEINFO where ROLEID = '330000000000481014';
+from ROLEINFO
+where ROLEID = '330000000000481014';
 
 select *
 from TB_ST_ASJ;
 
 update TB_ST_ASJ
 set LADW_GAJGJGDM = '330697000000';
+
+select *
+from CASEINFO
+where CATEGORIESCODE = '10';
+
+select *
+from caseinfo c
+where CATEGORIESCODE = '10'
+  and exists(select 1 from code_ajlb ca where ca.code = c.parentcategoriescode and ca.isxgxsaj = 1);
+
+select *
+from tb_st_asj t
+where exists(select 1 from code_ajlb ca where ca.code = t.ajlbdm and ca.isxgxsaj = 1);
+
+select p.*,
+       q.zlas,
+       q.xsajs,
+       q.ctxsajs,
+       q.qj,
+       q.qd,
+       q.dq,
+       q.fjcxzp,
+       decode(q.zlas, 0, 0, (round(p.cjs / q.zlas, 4)) * 100)          zcll,
+       decode(q.xsajs, 0, 0, (round(p.xsaj / q.xsajs, 4)) * 100)       xsajcll,
+       decode(q.ctxsajs, 0, 0, (round(p.ctxsaj / q.ctxsajs, 4)) * 100) ctxsajcll,
+       decode(q.XGAJ, 0, 0, (round(p.clxsaj / q.XGAJ, 4)) * 100)       xgajcll,
+       decode(q.xsajs, 0, 0, (round(q.qj / q.xsajs, 4)) * 100)         qjl,
+       decode(q.xsajs, 0, 0, (round(q.qd / q.xsajs, 4)) * 100)         qdl,
+       decode(q.xsajs, 0, 0, (round(q.dq / q.xsajs, 4)) * 100)         dql,
+       decode(q.xsajs, 0, 0, (round(q.fjcxzp / q.xsajs, 4)) * 100)     fjcxzpl,
+       decode(q.XSCTQC, 0, 0, (round(p.clxsctqc / q.XSCTQC, 4)) * 100) xsctqcccl,
+       decode(q.ZACTQC, 0, 0, (round(p.clzactqc / q.ZACTQC, 4)) * 100) zactqcccl
+from (select Y.*, decode(y.cjs, 0, 0, (round(y.lrjs / y.cjs, 4)) * 100) lrjsl
+      from (select r.roleid,
+                   r.rolename,
+                   r.dfkcode,
+                   nvl(sum(casecount), 0) cjs,
+                   nvl(sum(xsaj), 0)      xsaj,
+                   nvl(sum(zaaj), 0)      zaaj,
+                   nvl(sum(ctxsaj), 0)    ctxsaj,
+                   nvl(sum(clxgaj), 0)    clxsaj,
+                   nvl(sum(lrjs), 0)      lrjs,
+                   nvl(sum(clxsctqc), 0)  clxsctqc,
+                   nvl(sum(clzactqc), 0)  clzactqc
+            from (select roleid, rolename, parentid, fullpath, sortid, dfkcode
+                  from roleinfo
+                  where istreeshow = 1
+                    and parentid = '330000000000481001') r
+                     left join (select *
+                                from (select count(1)            as                                          casecount,
+                                             sum(case when c.categoriescode = '10' then 1 else 0 end)        xsaj,
+                                             sum(case when c.categoriescode = '20' then 1 else 0 end)        zaaj,
+                                             sum(case
+                                                     when C.CATEGORIESCODE = '10' AND EXISTS(SELECT 1
+                                                                                             FROM CODE_AJLB CA
+                                                                                             WHERE CA.CODE = PARENTCATEGORIESCODE
+                                                                                               AND CA.ISXGXSAJ = '1') AND
+                                                          (PARENTCATEGORIESCODE != '050002001800' AND
+                                                           PARENTCATEGORIESCODE NOT LIKE '0500030002%' OR
+                                                           (C.PARENTCATEGORIESCODE IS NULL OR C.PARENTCATEGORIESCODE LIKE '060210%'))
+                                                         then 1
+                                                     else 0 end)                                             ctxsaj,
+                                             sum(case
+                                                     when c.CATEGORIESCODE = '10' and exists(select 1
+                                                                                             from code_ajlb ca
+                                                                                             where ca.code = c.parentcategoriescode
+                                                                                               and ca.isxgxsaj = 1)
+                                                         then 1
+                                                     else 0 end) as                                          clxgaj,
+                                             sum(case when c.createdate - c.casetime <= 3 then 1 else 0 end) lrjs,
+                                             createdept,
+                                             fullpath,
+                                             SUM(case
+                                                     when
+                                                         (1 = 2 OR (exists(select 1
+                                                                           from code_ajlb ca
+                                                                           where code = c.PARENTCATEGORIESCODE
+                                                                             and ca.code_lev2 = '05000100')) OR
+                                                          (exists(select 1
+                                                                  from code_ajlb_xl ca
+                                                                  where code = c.CHILDCATEGORIESCODE
+                                                                    and ca.code_lev2 = '050099000000'))) then 1
+                                                     else 0 end) as                                          clxsctqc,
+                                             SUM(case
+                                                     when
+                                                         (1 = 2 OR (exists(select 1
+                                                                           from code_ajlb ca
+                                                                           where code = c.PARENTCATEGORIESCODE
+                                                                             and ca.code_lev2 = '05000100')) OR
+                                                          (exists(select 1
+                                                                  from code_ajlb_xl ca
+                                                                  where code = c.CHILDCATEGORIESCODE
+                                                                    and ca.code_lev2 = '050099000000'))) then 1
+                                                     else 0 end) as                                          clzactqc
+                                      from (SELECT C.*,
+                                                   I.FULLPATH
+                                            FROM CASEINFO C
+                                                     LEFT JOIN ROLEINFO I ON C.CREATEDEPT = I.ROLEID
+                                            WHERE C.ISDELETE = 0
+                                              AND C.CASESTATUS <> 3
+                                              AND I.ISTREESHOW = 1
+                                              AND (CASEINFOSTATUSCODE is null or CASEINFOSTATUSCODE <> '0500')
+                                              and I.FULLPATH LIKE
+                                                  (SELECT FULLPATH FROM ROLEINFO WHERE ROLEID = '330000000000481001') || '%'
+                                              and C.ESTABLISHDATE >=
+                                                  TO_DATE('2021-05-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+                                              and C.ESTABLISHDATE <=
+                                                  TO_DATE('2021-06-20 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
+                                              and C.CASESOURCE = '案件倒查') C
+                                      GROUP BY CREATEDEPT, FULLPATH)) M on M.fullpath like r.fullpath || '%'
+            GROUP BY R.ROLEID, R.ROLENAME, R.SORTID, R.DFKCODE
+            ORDER BY R.DFKCODE ASC, R.SORTID) Y) P
+         LEFT JOIN (SELECT R.ROLEID,
+                           R.ROLENAME,
+                           NVL(SUM(M.ZLAS), 0)    ZLAS,
+                           NVL(SUM(M.XSAJS), 0)   XSAJS,
+                           NVL(SUM(M.CTXSAJS), 0) CTXSAJS,
+                           NVL(SUM(M.XGAJ), 0)    XGAJ,
+                           NVL(SUM(M.QJ), 0)      QJ,
+                           NVL(SUM(M.QD), 0)      QD,
+                           NVL(SUM(M.DQ), 0)      DQ,
+                           NVL(SUM(M.FJCXZP), 0)  FJCXZP,
+                           NVL(SUM(M.xsctqc), 0)  XSCTQC,
+                           NVL(SUM(M.zactqc), 0)  ZACTQC
+                    FROM (SELECT ROLEID, ROLENAME, PARENTID, FULLPATH, SORTID, DFKCODE
+                          FROM ROLEINFO
+                          WHERE 1 = 1
+                            and parentid = '330000000000481001') r
+                             LEFT JOIN (SELECT LADW_GAJGJGDM                                                                          LADW,
+                                               (SELECT CG.CODE_LEV1 FROM CODE_GXS CG WHERE CODE = LADW_GAJGJGDM)                      LEV1,
+                                               (SELECT CG.CODE_LEV2 FROM CODE_GXS CG WHERE CODE = LADW_GAJGJGDM)                      LEV2,
+                                               (SELECT CG.CODE_LEV3 FROM CODE_GXS CG WHERE CODE = LADW_GAJGJGDM)                      LEV3,
+                                               (SELECT CG.CODE_LEV4 FROM CODE_GXS CG WHERE CODE = LADW_GAJGJGDM)                      LEV4,
+                                               (SELECT CG.CODE_LEV5 FROM CODE_GXS CG WHERE CODE = LADW_GAJGJGDM)                      LEV5,
+                                               COUNT(1)                                                                               ZLAS,
+                                               SUM(CASE WHEN XSJQLBDM = '100' THEN 1 ELSE 0 END)                                      XSAJS,
+                                               SUM(CASE
+                                                       WHEN XSJQLBDM = '100' AND
+                                                            (ISXGXSAJ = '1' AND ZATZ_JYQK != '050002001800' AND
+                                                             ZATZ_JYQK NOT LIKE '0500030002%' OR
+                                                             (CODELEV2 IS NULL OR CODELEV2 LIKE '060210%')) THEN 1
+                                                       ELSE 0 END)                                                                    CTXSAJS,
+                                               SUM(case when ISXGXSAJ = '1' then 1 else 0 end) as                                     XGAJ,
+                                               SUM(
+                                                       case when XSJQLBDM = '100' and codelev2 like '050004%' then 1 else 0 end)      qd,
+                                               SUM(
+                                                       case when XSJQLBDM = '100' and codelev2 like '050001%' then 1 else 0 end)      qj,
+                                               SUM(
+                                                       case when XSJQLBDM = '100' and codelev2 like '050002%' then 1 else 0 end)      dq,
+                                               SUM(
+                                                       case when XSJQLBDM = '100' and ZATZ_JYQK like '0500030002%' then 1 else 0 end) fjcxzp,
+                                               SUM(case
+                                                       when (1 = 2 OR (exists(select 1
+                                                                              from code_ajlb ca
+                                                                              where code = A.AJLBDM
+                                                                                and ca.code_lev2 = '05000100')) OR
+                                                             (exists(select 1
+                                                                     from code_ajlb ca
+                                                                     where code = A.AJLBDM
+                                                                       and ca.code_lev2 = '05000400')) OR (exists(
+                                                                   select 1
+                                                                   from code_ajlb ca
+                                                                   where code = A.AJLBDM
+                                                                     and ca.code_lev2 = '05000200')) OR (exists(select 1
+                                                                                                                from code_ajlb_xl ca
+                                                                                                                where code = A.ZATZ_JYQK
+                                                                                                                  and ca.code_lev2 = '050003000100')) OR
+                                                             (exists(select 1
+                                                                     from code_ajlb_xl ca
+                                                                     where code = A.ZATZ_JYQK
+                                                                       and ca.code_lev2 = '050099000000'))) then 1
+                                                       else 0 end)                             as                                     xsctqc,
+                                               SUM(case
+                                                       when (1 = 2 OR (exists(select 1
+                                                                              from code_ajlb ca
+                                                                              where code = A.AJLBDM
+                                                                                and ca.code_lev2 = '05000100')) OR
+                                                             (exists(select 1
+                                                                     from code_ajlb ca
+                                                                     where code = A.AJLBDM
+                                                                       and ca.code_lev2 = '05000400'))) then 1 else 0 end) as zactqc
+                                        FROM (SELECT T.LADW_GAJGJGDM,
+                                                     T.AJLBDM,
+                                                     T.PASJ,
+                                                     T.ZCJDDM,
+                                                     T.ZATZ_JYQK,
+                                                     T.XSJQLBDM,
+                                                     (SELECT C.ISXGXSAJ FROM CODE_AJLB C WHERE C.CODE = T.AJLBDM)  ISXGXSAJ,
+                                                     (SELECT C.CODE_LEV1 FROM CODE_AJLB C WHERE C.CODE = T.AJLBDM) CODELEV,
+                                                     (SELECT C.CODE FROM CODE_AJLB C WHERE C.CODE = T.AJLBDM)      CODELEV2
+                                              FROM TB_ST_ASJ T
+                                              WHERE 1 = 1
+                                                AND LARQ >= TO_DATE('2021-05-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS')
+                                                AND LARQ <= TO_DATE('2021-06-25 13:54:41', 'YYYY-MM-DD HH24:MI:SS')
+                                                and LADW_GAJGJGDM in (select code
+                                                                      from code_gxs ri
+                                                                      where ri.code =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001')
+                                                                         or ri.CODE_LEV1 =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001')
+                                                                         or ri.CODE_LEV2 =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001')
+                                                                         or ri.CODE_LEV3 =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001')
+                                                                         or ri.CODE_LEV4 =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001')
+                                                                         or ri.CODE_LEV5 =
+                                                                            (select dfkcode from roleinfo ri where ri.roleid = '330000000000481001'))) A
+                                        GROUP BY A.LADW_GAJGJGDM) M
+                                       ON (R.DFKCODE = M.LEV1 OR R.DFKCODE = M.LEV2 OR R.DFKCODE = M.LEV3 OR
+                                           R.DFKCODE = M.LEV4 OR R.DFKCODE = M.LEV5 OR R.DFKCODE = M.LADW)
+                    GROUP BY R.ROLEID, R.ROLENAME, R.SORTID, R.DFKCODE
+                    ORDER BY R.DFKCODE ASC, R.SORTID) Q ON P.ROLEID = Q.ROLEID;
+
+select PARENTCATEGORIESCODE, CHILDCATEGORIESCODE
+from CASEINFO
+where PARENTCATEGORIESCODE is not null
+  and CHILDCATEGORIESCODE is not null;
+
+select *
+from TB_ST_ASJ;
+
+select *
+from CASECATEGORYLABEL
+where NAME = '传统刑事侵财';
+
+SELECT *
+FROM CODE_AJLB;
