@@ -616,7 +616,8 @@ from (select Y.*, decode(y.cjs, 0, 0, (round(y.lrjs / y.cjs, 4)) * 100) lrjsl
                                                              (exists(select 1
                                                                      from code_ajlb ca
                                                                      where code = A.AJLBDM
-                                                                       and ca.code_lev2 = '05000400'))) then 1 else 0 end) as zactqc
+                                                                       and ca.code_lev2 = '05000400'))) then 1
+                                                       else 0 end)                             as                                     zactqc
                                         FROM (SELECT T.LADW_GAJGJGDM,
                                                      T.AJLBDM,
                                                      T.PASJ,
