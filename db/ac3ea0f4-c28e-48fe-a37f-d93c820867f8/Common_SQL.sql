@@ -1144,7 +1144,7 @@ from (select b2.GZJB                  as togetherAttentionLevel,
              f1.VIIDSERVERID          as viidServerId
       from TBL_VIID_ZDR_FOOTPOINT f1
                inner join TBL_VIID_ZDR_FOOTPOINT f2 on
-              f2.ZDRID != f1.ZDRID
+                  f2.ZDRID != f1.ZDRID
               and f2.SHOTTIME >= to_date('2019-01-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
               and f2.SHOTTIME <= to_date('2021-09-03 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
               and f2.DEVICEID = f1.DEVICEID
@@ -1738,7 +1738,7 @@ from (select b2.GZJB                  as togetherAttentionLevel,
                            from TBL_VIID_ZDR_FOOTPOINT t2
                            where t2.SHOTTIME >= to_date('2021-05-09 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
                              and t2.SHOTTIME <= to_date('2021-05-09 23:00:00', 'yyyy-mm-dd hh24:mi:ss')) f2 on
-              f2.ZDRID != f1.ZDRID
+                  f2.ZDRID != f1.ZDRID
               and f1.IDNUMBER != f2.IDNUMBER
               and f2.DEVICEID = f1.DEVICEID
               and f1.SHOTTIME >= (f2.SHOTTIME + INTERVAL '-5' SECOND)

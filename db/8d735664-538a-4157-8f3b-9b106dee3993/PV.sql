@@ -66,17 +66,6 @@ from (select to_char(GXSJ, 'yyyy-mm-dd hh24:mi:ss') as time
       order by GXSJ asc)
 where ROWNUM = 1;
 
-select SBBM from ZCGL_DEVICE where GXSJ >= to_date('2021-07-05 14:03:58', 'yyyy-mm-dd hh24:mi:ss');
-
-select SBBM,
-       SBMC,
-       JKDWLX,
-       MACDZ,
-       IP,
-       SXJGNLX,
-       JD,
-       WD,
-       SXJCJQY,
-       SBZT
+select SBBM
 from ZCGL_DEVICE
-where SBBM in ();
+where GXSJ >= to_date('2021-07-05 14:03:58', 'yyyy-mm-dd hh24:mi:ss');
