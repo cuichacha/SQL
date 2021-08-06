@@ -2089,3 +2089,130 @@ from (select t1.*,
         and b.XM like '%%') z
          left join TBL_VIID_ZDR_FOOTPOINT f on z.FOLLOWFACEID = f.ID
          left join TBL_VIID_ZDR_BASICINFO b on z.FOLLOWZDRID = b.ZDRID;
+
+WITH t AS (select f.id,
+                  f.zdrid,
+                  f.idnumber,
+                  to_char(f.shottime, 'hh24:mi')  htime,
+                  to_char(f.shottime, 'yyyymmdd') activityDate
+           from tbl_viid_zdr_footPoint f
+           WHERE trunc(f.SHOTTIME) = trunc(to_date('2021-08-02 00:00:00', 'yyyy-mm-dd hh24:mi:ss')))
+select b.zdrid as zdrId, b.gmsfhm as idNumber, nvl(z.daytime, 0) daytime, nvl(z.night, 0) night
+from tbl_viid_zdr_basicinfo b
+         left join (select t.zdrid, 1 as daytime, 1 as night
+                    from t
+                             left join (select t.zdrid, count(*) amcount
+                                        from t
+                                        where 1 = 1
+                                          AND t.htime >= '04:00'
+                                          AND t.htime <= '11:00'
+                                        group by t.zdrId) t1 on t.zdrid = t1.zdrid
+                             left join (SELECT t.zdrId, count(*) pmcount
+                                        from t
+                                        where 1 = 1
+                                          AND t.htime >= '13:00'
+                                          AND t.htime <= '22:00'
+                                        group by t.zdrId) t2 on t.zdrid = t2.zdrid
+                    where 1 = 1
+                      and nvl(t1.amcount, 0) <= 1
+                      and nvl(t2.pmcount, 0) >= 1
+                    group by t.zdrid) z on b.zdrid = z.zdrid;
+
+
+SELECT *
+FROM (SELECT m.*, ROWNUM RN
+      FROM (select f.zdrid  as                                                                   zdrId,
+                   f.gmsfhm as                                                                   idNumber,
+                   f.xm     as                                                                   name,
+                   f.xp,
+                   f.rklx,
+                   f.gzjb,
+                   (select wm_concat(cnt) from codedetail where typeid = 'RKLX' and id = f.rklx) rylxName,
+                   (select wm_concat(cnt) from codedetail where typeid = 'GZJB' and id = f.gzjb) gzjbName,
+                   nvl(a.amCount, 0)                                                             amCount,
+                   nvl(p.pmCount, 0)                                                             pmCount
+            from tbl_viid_zdr_basicinfo f
+                     left join (select count(*) amCount, f.zdrid
+                                from tbl_viid_zdr_zfyc f
+                                where 1 = 1
+                                  AND f.daytime = 1
+                                  AND f.activityDate >= to_number(?)
+                                  AND f.activityDate <= to_number(?)
+                                group by f.zdrid) a on f.zdrid = a.zdrid
+                     left join (select count(*) pmCount, f.zdrid
+                                from tbl_viid_zdr_zfyc f
+                                where 1 = 1
+                                  AND f.night = 1
+                                  AND f.activityDate >= to_number(?)
+                                  AND f.activityDate <= to_number(?)
+                                group by f.zdrid) p on f.zdrid = p.zdrid
+            where 1 = 1
+              and nvl(a.amCount, 0) >= 1
+              and nvl(p.pmCount, 0) >= 1
+            order by a.amCount, p.pmCount) m
+      WHERE ROWNUM <= 20)
+WHERE RN > 0;
+
+
+SELECT *
+FROM (SELECT m.*, ROWNUM RN
+      FROM (select p.zdrid                                                                       as zdrId,
+                   b.xp                                                                          as xp,
+                   b.xm                                                                          as name,
+                   b.rklx                                                                        as rklx,
+                   p.datecount                                                                   as hightCount,
+                   (select wm_concat(cnt) from codedetail where typeid = 'RKLX' and id = b.rklx) as rylxName
+            from tbl_viid_zdr_pcfx p
+                     left join tbl_viid_zdr_basicinfo b on p.zdrid = b.zdrid
+            where 1 = 1
+              AND p.activityDate >= to_number(20210731000000)
+              AND p.activityDate <= to_number(20210803)
+              AND p.datecount >= 1
+            order by p.datecount) m
+      WHERE ROWNUM <= 20)
+WHERE RN > 0;
+
+
+select *
+from CODEDETAIL
+where ID like 'Track%';
+
+select distinct DEVICEID
+from TBL_VIID_ZDR_FOOTPOINT
+where SHOTTIME <= sysdate
+  and SHOTTIME >= sysdate - 90;
+
+select ZDRID, count(1)
+from TBL_VIID_ZDR_FOOTPOINT
+where DEVICEID in (select distinct DEVICEID
+                   from TBL_VIID_ZDR_FOOTPOINT
+                   where SHOTTIME <= sysdate
+                     and SHOTTIME >= sysdate - 90)
+group by ZDRID;
+
+select ZDRID
+from TBL_VIID_ZDR_BASICINFO
+where XM = '朱代红';
+
+select *
+from TBL_VIID_ZDR_PCFX
+where ZDRID = '';
+
+select count(1)
+from TBL_VIID_ZDR_PCFX;
+
+select count(*), ZDRID, ACTIVITYDATE, IDNUMBER, DEVICEID
+from TBL_VIID_ZDR_PCFX
+group by ZDRID, ACTIVITYDATE, IDNUMBER, DEVICEID
+having count(*) > 1;
+
+delete from TBL_VIID_ZDR_PCFX;
+
+select *
+from TBL_VIID_ZDR_PCFX where ZDRID = '' and ACTIVITYDATE = '20210804';
+
+select *
+from TBL_VIID_ZDR_FOOTPOINT where ZDRID = '' and trunc(SHOTTIME) = to_date('2021-08-04', 'yyyy-mm-dd');
+
+select trunc(SHOTTIME)
+from TBL_VIID_ZDR_FOOTPOINT where ID = '6100000000000220210719120607774142021071914000400000049';
