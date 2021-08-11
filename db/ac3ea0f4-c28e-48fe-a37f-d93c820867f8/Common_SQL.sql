@@ -2136,15 +2136,15 @@ FROM (SELECT m.*, ROWNUM RN
                                 from tbl_viid_zdr_zfyc f
                                 where 1 = 1
                                   AND f.daytime = 1
-                                  AND f.activityDate >= to_number(?)
-                                  AND f.activityDate <= to_number(?)
+                                  AND f.activityDate >= to_number('6101')
+                                  AND f.activityDate <= to_number('6101')
                                 group by f.zdrid) a on f.zdrid = a.zdrid
                      left join (select count(*) pmCount, f.zdrid
                                 from tbl_viid_zdr_zfyc f
                                 where 1 = 1
                                   AND f.night = 1
-                                  AND f.activityDate >= to_number(?)
-                                  AND f.activityDate <= to_number(?)
+                                  AND f.activityDate >= to_number('6101')
+                                  AND f.activityDate <= to_number('6101')
                                 group by f.zdrid) p on f.zdrid = p.zdrid
             where 1 = 1
               and nvl(a.amCount, 0) >= 1
@@ -2206,13 +2206,168 @@ from TBL_VIID_ZDR_PCFX
 group by ZDRID, ACTIVITYDATE, IDNUMBER, DEVICEID
 having count(*) > 1;
 
-delete from TBL_VIID_ZDR_PCFX;
+delete
+from TBL_VIID_ZDR_PCFX;
 
 select *
-from TBL_VIID_ZDR_PCFX where ZDRID = '' and ACTIVITYDATE = '20210804';
+from TBL_VIID_ZDR_PCFX
+where ZDRID = ''
+  and ACTIVITYDATE = '20210804';
 
 select *
-from TBL_VIID_ZDR_FOOTPOINT where ZDRID = '' and trunc(SHOTTIME) = to_date('2021-08-04', 'yyyy-mm-dd');
+from TBL_VIID_ZDR_FOOTPOINT
+where ZDRID = ''
+  and trunc(SHOTTIME) = to_date('2021-08-04', 'yyyy-mm-dd');
 
 select trunc(SHOTTIME)
-from TBL_VIID_ZDR_FOOTPOINT where ID = '6100000000000220210719120607774142021071914000400000049';
+from TBL_VIID_ZDR_FOOTPOINT
+where ID = '6100000000000220210719120607774142021071914000400000049';
+
+select count(*)                      as dateCount,
+       zdrid                         as zdrId,
+       idnumber                      as idNumber,
+       deviceid                      as deviceId,
+       to_char(shottime, 'yyyyMMdd') as activityDate
+from tbl_viid_zdr_footpoint
+where 1 = 1
+  -- and ZDRID = '2_1234512'
+  and to_number(to_char(shottime, 'yyyyMMdd')) = '20210719'
+  and deviceid = '61052622011310000008'
+group by zdrid, idnumber, deviceid, to_char(shottime, 'yyyyMMdd');
+
+select count(ZDRID) as count,
+from TBL_VIID_ZDR_PCFX
+where DATECOUNT >= 10
+  and ACTIVITYDATE >= to_char(ADD_MONTHS(sysdate, -1), 'yyyyMMdd')
+group by ZDRID;
+
+select sum(num) as count, 'aaa' as cnt
+from (select count(ZDRID) as num
+      from TBL_VIID_ZDR_PCFX
+      where DATECOUNT >= 10
+      group by ZDRID);
+
+select count(*) count, '实时告警' as cnt
+from tbl_viid_zdr_footPoint f
+where f.SHOTTIME < trunc(sysdate) + 1
+  AND f.SHOTTIME >= trunc(sysdate)
+union
+select count(*) count, '历史告警' as cnt
+from tbl_viid_zdr_footPoint f
+union
+select count(*) count, '轨迹总数' as cnt
+from tbl_viid_zdr_footPoint f
+union
+SELECT COUNT(*) COUNT, '档案总数' AS cnt
+FROM tbl_viid_zdr_personDoc f
+union
+SELECT COUNT(*) COUNT, '基本信息' AS cnt
+FROM tbl_viid_zdr_basicInfo f
+union
+select sum(num) as count, '频繁活动' as cnt
+from (select count(*) as num
+      from TBL_VIID_ZDR_PCFX p
+               left join tbl_viid_zdr_basicInfo b on p.zdrid = b.zdrid
+      WHERE p.DATECOUNT >= 10
+      group by p.ZDRID);
+
+
+
+
+
+select count(*) count, '实时告警' as cnt
+from tbl_viid_zdr_footPoint f
+where f.SHOTTIME < trunc(sysdate) + 1
+  AND f.SHOTTIME >= trunc(sysdate)
+  and placecode like rpad('6101', 4, '0') || '%'
+union
+select count(*) count, '历史告警' as cnt
+from tbl_viid_zdr_footPoint f
+WHERE placecode like rpad('6101', 4, '0') || '%'
+union
+select count(*) count, '轨迹总数' as cnt
+from tbl_viid_zdr_footPoint f
+WHERE placecode like rpad('6101', 4, '0') || '%'
+union
+SELECT COUNT(*) COUNT, '档案总数' AS cnt
+FROM tbl_viid_zdr_personDoc f
+WHERE EXISTS(SELECT 1
+             FROM (SELECT zdrid FROM tbl_viid_zdr_basicInfo o WHERE placecode like rpad('6101', 4, '0') || '%') b
+             WHERE b.zdrid = f.ZDRID)
+union
+SELECT COUNT(*) COUNT, '基本信息' AS cnt
+FROM tbl_viid_zdr_basicInfo f
+WHERE placecode like rpad('6101', 4, '0') || '%'
+union
+select nvl(sum(num), 0) as count, '频繁活动' as cnt
+from (select count(*) as num
+      from TBL_VIID_ZDR_PCFX p
+      WHERE p.DATECOUNT >= 10
+        and EXISTS(SELECT 1
+                   FROM (SELECT zdrid FROM tbl_viid_zdr_basicInfo WHERE placecode like rpad('6101', 4, '0') || '%') b
+                   WHERE b.zdrid = p.ZDRID)
+        and p.ACTIVITYDATE >= to_char(trunc(sysdate), 'yyyyMMdd')
+      group by p.ZDRID);
+
+
+
+
+SELECT *
+FROM (SELECT m.*, ROWNUM RN
+      FROM (select idnumber    as                                                                         idNumber,
+                   b.zdrid     as                                                                         zdrId,
+                   b.name      as                                                                         name,
+                   outTime,
+                   backTime,
+                   a.placeName as                                                                         outPlaceCodeName,
+                   b.placeName as                                                                         backPlaceCodeName,
+                   t.xp        as                                                                         xp,
+                   t.gzjb      as                                                                         gzjb,
+                   (select wm_concat(cnt)
+                    from codedetail
+                    where typeid = 'RKLX'
+                      and id = (select rklx from tbl_viid_zdr_basicinfo tt where tt.gmsfhm = a.idnumber)) rylxName,
+                   (select wm_concat(cnt)
+                    from codedetail
+                    where typeid = 'GZJB'
+                      and id = (select gzjb from tbl_viid_zdr_basicinfo tt where tt.gmsfhm = a.idnumber)) gzjbName
+            from (select distinct(f.zdrId),
+                                 q.name                                    as placeName,
+                                 f.areacode,
+                                 f.placeCode,
+                                 f.placeCodeName,
+                                 f.idnumber,
+                                 f.name,
+                                 concat(to_char(f.shottime, 'yyyy-mm-dd '),
+                                        to_char(f.shottime, 'hh24:mi:ss')) as outTime,
+                                 f.shottime
+                  from tbl_viid_zdr_footpoint f
+                           left join eqp_area q on rpad(f.areacode, 6, '0') = rpad(q.id, 6, '0')
+                  where 1 = 1
+                    AND f.SHOTTIME > to_date('2020-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                    AND f.SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                    AND f.similaritydegree >= to_number(0.95) / 100
+                    AND to_char(f.shottime, 'hh24:mi:ss') >= '07:00:00'
+                    AND to_char(f.shottime, 'hh24:mi:ss') <= '09:00:00') a
+                     left join (select distinct(f.zdrId),
+                                               q.name                                    as placeName,
+                                               f.areacode,
+                                               f.placeCode,
+                                               f.placeCodeName,
+                                               f.name,
+                                               concat(to_char(f.shottime, 'yyyy-mm-dd '),
+                                                      to_char(f.shottime, 'hh24:mi:ss')) as backTime,
+                                               f.shottime
+                                from tbl_viid_zdr_footpoint f
+                                         left join eqp_area q on rpad(f.areacode, 6, '0') = rpad(q.id, 6, '0')
+                                where 1 = 1
+                                  AND f.SHOTTIME > to_date('2020-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                                  AND f.SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                                  AND f.similaritydegree >= to_number(0.95) / 100
+                                  AND to_char(f.shottime, 'hh24:mi:ss') >= '18:00:00'
+                                  AND to_char(f.shottime, 'hh24:mi:ss') <= '20:00:00') b on a.zdrId = b.zdrId
+                     left join tbl_viid_zdr_basicinfo t on b.zdrid = t.zdrid
+            where a.shottime <= b.shottime
+            order by outTime) m
+      WHERE ROWNUM <= 20)
+WHERE RN > 0;

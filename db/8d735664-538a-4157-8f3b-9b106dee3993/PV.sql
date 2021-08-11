@@ -69,3 +69,9 @@ where ROWNUM = 1;
 select SBBM
 from ZCGL_DEVICE
 where GXSJ >= to_date('2021-07-05 14:03:58', 'yyyy-mm-dd hh24:mi:ss');
+
+select a.HONOR, a.MEMO, a.id as honorid, b.*, (select c.NAME from SCOUTROOM c where b.ROOMID = c.ID) as room_txt
+from scoutroom_person_honor a
+         left join SCOUTROOM_PERSON b on a.PERSONID = b.ID
+where 1 = 1
+order by b.usernumber;
