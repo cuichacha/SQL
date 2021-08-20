@@ -75,3 +75,48 @@ from scoutroom_person_honor a
          left join SCOUTROOM_PERSON b on a.PERSONID = b.ID
 where 1 = 1
 order by b.usernumber;
+
+select count(*)
+from ZCGL_DEVICE_SOURCE
+where length(substr(to_char(JD), instr(to_char(JD), '.') + 1)) < 6
+   or length(substr(to_char(WD), instr(to_char(WD), '.') + 1)) < 6;
+
+update ZCGL_DEVICE_SOURCE
+set ASSERTSTATUS = null;
+update ZCGL_DEVICE_SOURCE
+set CREATETIME = sysdate;
+
+select SBBM,
+       SBMC,
+       JKDWLX,
+       MACDZ,
+       IP,
+       SXJGNLX,
+       JD,
+       WD,
+       SXJCJQY,
+       SBZT,
+       UPLOADUSER
+from ZCGL_DEVICE_SOURCE
+where ASSERTSTATUS is null
+order by CREATETIME asc;
+
+update SMS_AUTH set AUTHTIME = sysdate where ID = '31';
+
+select JD, WD
+from ZCGL_DEVICE_SOURCE;
+
+delete
+from ZCGL_DEVICE_SOURCE;
+delete
+from ZCGL_DEVICE;
+
+select count(*)
+from ZCGL_DEVICE_SOURCE
+where ASSERTSTATUS = null;
+
+select *
+from ZCGL_DEVICE_SOURCE
+where IP = '61.7.30.66';
+
+select id, phone from sms_auth;

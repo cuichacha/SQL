@@ -2371,3 +2371,6 @@ FROM (SELECT m.*, ROWNUM RN
             order by outTime) m
       WHERE ROWNUM <= 20)
 WHERE RN > 0;
+
+select *
+from COMMONMENUGROUP where RIGHTNAME is not null;
