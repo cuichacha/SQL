@@ -2273,8 +2273,6 @@ from (select count(*) as num
 
 
 
-
-
 select count(*) count, '实时告警' as cnt
 from tbl_viid_zdr_footPoint f
 where f.SHOTTIME < trunc(sysdate) + 1
@@ -2308,7 +2306,6 @@ from (select count(*) as num
                    WHERE b.zdrid = p.ZDRID)
         and p.ACTIVITYDATE >= to_char(trunc(sysdate), 'yyyyMMdd')
       group by p.ZDRID);
-
 
 
 
@@ -2373,4 +2370,43 @@ FROM (SELECT m.*, ROWNUM RN
 WHERE RN > 0;
 
 select *
-from COMMONMENUGROUP where RIGHTNAME is not null;
+from COMMONMENUGROUP
+where RIGHTNAME is not null;
+
+select *
+from CODEDETAIL
+where TYPEID = 'SXJGNLX';
+
+select trunc(sysdate)
+from dual; --2011-3-18  今天的日期为2011-3-18
+select trunc(sysdate, 'mm')
+from dual; --2011-3-1    返回当月第一天.
+select trunc(sysdate, 'yy')
+from dual; --2011-1-1       返回当年第一天
+select trunc(sysdate, 'dd')
+from dual; --2011-3-18    返回当前年月日
+select trunc(sysdate, 'yyyy')
+from dual; --2011-1-1   返回当年第一天
+select trunc(sysdate, 'd')
+from dual; --2011-3-13 (星期天)返回当前星期的第一天
+select trunc(sysdate, 'hh')
+from dual; --2011-3-18 14:00:00   当前时间为14:41
+select trunc(sysdate, 'mi')
+from dual; --2011-3-18 14:41:00   TRUNC()函数没有秒的精确
+
+select ZDRID, to_char(SHOTTIME, 'yyyy-mm-dd'), count(*)
+from TBL_VIID_ZDR_FOOTPOINT
+group by ZDRID, to_char(SHOTTIME, 'yyyy-mm-dd');
+
+select ZDRID, to_char(SHOTTIME, 'yyyy-mm'), count(*)
+from TBL_VIID_ZDR_FOOTPOINT
+group by ZDRID, to_char(SHOTTIME, 'yyyy-mm');
+
+select f.ZDRID, to_char(f.SHOTTIME, 'yyyy'), count(*)
+from TBL_VIID_ZDR_FOOTPOINT f
+group by f.ZDRID, to_char(f.SHOTTIME, 'yyyy');
+
+select f.ZDRID, f.time, f.count, b.PLACECODE, b.XM, b.GMSFHM, b.XP
+from (select ZDRID, to_char(SHOTTIME, 'yyyy-mm') as time, count(*) as count
+from TBL_VIID_ZDR_FOOTPOINT
+group by ZDRID, to_char(SHOTTIME, 'yyyy-mm')) f left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID;

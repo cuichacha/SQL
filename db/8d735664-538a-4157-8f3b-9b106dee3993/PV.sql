@@ -101,7 +101,9 @@ from ZCGL_DEVICE_SOURCE
 where ASSERTSTATUS is null
 order by CREATETIME asc;
 
-update SMS_AUTH set AUTHTIME = sysdate where ID = '31';
+update SMS_AUTH
+set AUTHTIME = sysdate
+where ID = '31';
 
 select JD, WD
 from ZCGL_DEVICE_SOURCE;
@@ -119,4 +121,48 @@ select *
 from ZCGL_DEVICE_SOURCE
 where IP = '61.7.30.66';
 
-select id, phone from sms_auth;
+select *
+from sms_auth
+where CREATOR != 'admin001@zjtek.com'
+  and SCOPE = 2
+union
+select *
+from SMS_AUTH
+where CREATOR = 'admin001@zjtek.com';
+
+select *
+from (select id,
+             phone,
+             alias,
+             certificate,
+             to_char(authtime, 'yyyy-mm-dd hh24:mi:ss') as authtime,
+             scope
+      from sms_auth
+      where CREATOR != 'admin001@zjtek.com'
+        and SCOPE = 2
+      union
+      select id,
+             phone,
+             alias,
+             certificate,
+             to_char(authtime, 'yyyy-mm-dd hh24:mi:ss') as authtime,
+             scope
+      from SMS_AUTH
+      where CREATOR = 'admin001@zjtek.com')
+order by AUTHTIME desc;
+
+SELECT *
+FROM (SELECT m.*, ROWNUM RN
+      FROM (select *
+            from (select id, phone, alias, certificate, to_char(authtime, 'yyyy-mm-dd hh24:mi:ss') as authtime, scope
+                  from sms_auth
+                  where SCOPE = 2
+                    and creator = 'admin001@zjtek.com'
+                  union
+                  select id, phone, alias, certificate, to_char(authtime, 'yyyy-mm-dd hh24:mi:ss') as authtime, scope
+                  from SMS_AUTH
+                  where 1 = 1
+                    and creator = 'admin001@zjtek.com')
+            order by AUTHTIME desc) m
+      WHERE ROWNUM <= 20)
+WHERE RN > 0;
