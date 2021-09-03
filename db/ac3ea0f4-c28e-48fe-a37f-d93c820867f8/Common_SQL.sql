@@ -2410,3 +2410,12 @@ select f.ZDRID, f.time, f.count, b.PLACECODE, b.XM, b.GMSFHM, b.XP
 from (select ZDRID, to_char(SHOTTIME, 'yyyy-mm') as time, count(*) as count
 from TBL_VIID_ZDR_FOOTPOINT
 group by ZDRID, to_char(SHOTTIME, 'yyyy-mm')) f left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID;
+
+select (select name from EQP_AREA where ID = substr(z.SBBM, 0, 6)) as XZQYNAME,
+       z.*
+from ZCGL_DEVICE z where substr(z.SBBM, 0, 6) like '610524%';
+
+select *
+from EQP_AREA where ID like '61';
+
+update ZCGL_DEVICE set TBZT = '11' where TBZT is null;

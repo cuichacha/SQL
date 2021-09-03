@@ -83,6 +83,7 @@ where length(substr(to_char(JD), instr(to_char(JD), '.') + 1)) < 6
 
 update ZCGL_DEVICE_SOURCE
 set ASSERTSTATUS = null;
+
 update ZCGL_DEVICE_SOURCE
 set CREATETIME = sysdate;
 
@@ -110,6 +111,7 @@ from ZCGL_DEVICE_SOURCE;
 
 delete
 from ZCGL_DEVICE_SOURCE;
+
 delete
 from ZCGL_DEVICE;
 
@@ -166,3 +168,224 @@ FROM (SELECT m.*, ROWNUM RN
             order by AUTHTIME desc) m
       WHERE ROWNUM <= 20)
 WHERE RN > 0;
+
+select *
+from ZCGL_DEVICE_SOURCE s
+where s.ASSERTSTATUS = 200
+  and s.SBBM not in (select SBBM from ZCGL_DEVICE);
+
+
+
+insert into ZCGL_DEVICE (SBBM, SBMC, JKDWLX, IP, MACDZ, SXJGNLX,
+                         JD, WD, SXJCJQY, SBZT)
+values (select SBBM, SBMC, JKDWLX, IP, MACDZ, SXJGNLX,
+                                     JD, WD, SXJCJQY, SBZT
+from s
+where s.ASSERTSTATUS = 200
+  and s.SBBM not in (select SBBM from ZCGL_DEVICE));
+
+
+insert into zcgl_device
+(SBBM, SBMC, JKDWLX, IP, MACDZ, SXJGNLX,
+ JD, WD, SXJCJQY, SBZT, GXSJ, RKSJ)
+select SBBM,
+       SBMC,
+       JKDWLX,
+       IP,
+       MACDZ,
+       SXJGNLX,
+       JD,
+       WD,
+       SXJCJQY,
+       SBZT,
+       sysdate,
+       sysdate
+from zcgl_device_source s
+where s.ASSERTSTATUS = 200
+  and not exists(select 1 from zcgl_device z where z.sbbm = s.sbbm);
+
+select *
+from ZCGL_DEVICE_SOURCE
+where IP = '61.24.47.113';
+
+alter table ZCGL_DEVICE
+    modify WD number(38, 11);
+
+merge into ZCGL_DEVICE z1
+using (select *
+       from (select CREATETIME,
+                    SBBM,
+                    SBMC,
+                    JKDWLX,
+                    IP,
+                    MACDZ,
+                    SXJGNLX,
+                    JD,
+                    WD,
+                    SXJCJQY,
+                    SBZT,
+                    row_number() over (partition by SBBM order by CREATETIME desc) as seq
+             from ZCGL_DEVICE_SOURCE
+             where ASSERTSTATUS = '200')
+       where seq = 1) z2
+on (z1.SBBM = z2.SBBM and z1.GXSJ < z2.CREATETIME)
+when matched then
+    update
+    set z1.SBMC    = z2.SBMC,
+        z1.JKDWLX  = z2.JKDWLX,
+        z1.IP      = z2.IP,
+        z1.MACDZ   = z2.MACDZ,
+        z1.SXJGNLX = z2.SXJGNLX,
+        z1.JD      = z2.JD,
+        z1.WD      = z2.WD,
+        z1.SXJCJQY = z2.SXJCJQY,
+        z1.SBZT    = z2.SBZT,
+        z1.TBZT    = null;
+
+select CREATETIME,
+       SBBM,
+       SBMC,
+       JKDWLX,
+       IP,
+       MACDZ,
+       SXJGNLX,
+       JD,
+       WD,
+       SXJCJQY,
+       SBZT,
+       row_number() over (partition by SBBM order by CREATETIME desc) as seq
+from ZCGL_DEVICE_SOURCE
+where SBBM = '61012299001310000028'
+order by CREATETIME desc;
+
+select *
+from (select CREATETIME,
+             SBBM,
+             SBMC,
+             JKDWLX,
+             IP,
+             MACDZ,
+             SXJGNLX,
+             JD,
+             WD,
+             SXJCJQY,
+             SBZT,
+             row_number() over (partition by SBBM order by CREATETIME desc) as seq
+      from ZCGL_DEVICE_SOURCE
+      where ASSERTSTATUS = '200')
+where seq = 1;
+
+
+select (select count(*)
+        from ZCGL_DEVICE)           as formalCount,
+       (select count(*)
+        from ZCGL_DEVICE_SOURCE)    as pushCount,
+       (select count(distinct SBBM)
+        from ZCGL_DEVICE_SOURCE
+        where ASSERTSTATUS = '200') as accurateCount
+from DUAL;
+
+select formalCount, pushCount, accurateCount, (pushCount - accurateCount) as inaccurateCount
+from (select (select count(*)
+              from ZCGL_DEVICE)           as formalCount,
+             (select count(*)
+              from ZCGL_DEVICE_SOURCE)    as pushCount,
+             (select count(distinct SBBM)
+              from ZCGL_DEVICE_SOURCE
+              where ASSERTSTATUS = '200') as accurateCount
+      from DUAL);
+
+select substr(SBBM, 0, 4) as place, count(substr(SBBM, 0, 4)) as total
+from ZCGL_DEVICE
+group by substr(SBBM, 0, 4);
+
+select substr(SBBM, 0, 4) as place, count(substr(SBBM, 0, 4)) as pushCount
+from ZCGL_DEVICE_SOURCE
+where ASSERTSTATUS = '200'
+group by substr(SBBM, 0, 4);
+
+select substr(SBBM, 0, 4)            as place,
+       (select count(substr(SBBM, 0, 4))
+        from ZCGL_DEVICE_SOURCE
+        group by substr(SBBM, 0, 4)) as pushTotal,
+       (select count(substr(SBBM, 0, 4))
+        from ZCGL_DEVICE_SOURCE
+        where ASSERTSTATUS = '200'
+        group by substr(SBBM, 0, 4)) as accurateCount
+from ZCGL_DEVICE_SOURCE
+group by substr(SBBM, 0, 4);
+
+select place,
+       total,
+       pushTotal,
+       accurateCount,
+       (pushTotal - accurateCount)         as inaccurateTotal,
+       round(accurateCount / pushTotal, 2) as accurateRate
+from (select substr(SBBM, 0, 4)            as place,
+             (select count(SBBM)
+              from ZCGL_DEVICE
+              group by substr(SBBM, 0, 4)) as total,
+             (select count(SBBM)
+              from ZCGL_DEVICE_SOURCE
+              group by substr(SBBM, 0, 4)) as pushTotal,
+             (select count(distinct SBBM)
+              from ZCGL_DEVICE_SOURCE
+              where ASSERTSTATUS = '200'
+              group by substr(SBBM, 0, 4)) as accurateCount
+      from ZCGL_DEVICE_SOURCE
+      group by substr(SBBM, 0, 4));
+
+select count(distinct SBBM)
+from ZCGL_DEVICE_SOURCE
+where ASSERTSTATUS = '200'
+group by substr(SBBM, 0, 6);
+
+select substr(SBBM, 0, 4) as placeCode, count(*) as pushTotal
+from ZCGL_DEVICE_SOURCE
+where substr(SBBM, 0, 4) like '61%'
+group by substr(SBBM, 0, 4);
+
+select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
+       nvl(pushTotal, 0)
+from (select substr(SBBM, 0, 4) as placeCode, count(*) as pushTotal
+      from ZCGL_DEVICE_SOURCE
+      where substr(SBBM, 0, 4) like '61%'
+      group by substr(SBBM, 0, 4));
+
+select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
+       placeCode,
+       nvl(accurateCount, 0)                                        as accurateCount
+from (select substr(SBBM, 0, 4) as placeCode, count(distinct SBBM) as accurateCount
+      from ZCGL_DEVICE_SOURCE
+      where substr(SBBM, 0, 4) like '61%'
+      group by substr(SBBM, 0, 4));
+
+with t1 as (select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
+                   placeCode,
+                   nvl(pushTotal, 0)                                            as pushTotal
+            from (select substr(SBBM, 0, 6) as placeCode, count(SBBM) as pushTotal
+                  from ZCGL_DEVICE_SOURCE
+                  where substr(SBBM, 0, 6) like '610122%'
+                  group by substr(SBBM, 0, 6))),
+     t2 as (select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
+                   placeCode,
+                   nvl(accurateCount, 0)                                        as accurateCount
+            from (select substr(SBBM, 0, 6) as placeCode, count(distinct SBBM) as accurateCount
+                  from ZCGL_DEVICE_SOURCE
+                  where substr(SBBM, 0, 6) like '610122%'
+                  group by substr(SBBM, 0, 6))),
+     t3 as (select count(*) as total, substr(SBBM, 0, 6) as placeCode
+            from ZCGL_DEVICE
+            where substr(SBBM, 0, 6) like '610122%'
+            group by substr(SBBM, 0, 6))
+select xzqyName,
+       nvl(total, 0)                         as total,
+       pushTotal,
+       accurateCount,
+       (pushTotal - accurateCount)           as inaccurateTotal,
+       round((accurateCount / pushTotal), 2) as accurateRate
+from (select t1.xzqyName, t1.pushTotal, t2.accurateCount, t3.total
+      from t1
+               left outer join t2 on t1.placeCode = t2.placeCode
+               left outer join t3 on t2.placeCode = t3.placeCode);
+
