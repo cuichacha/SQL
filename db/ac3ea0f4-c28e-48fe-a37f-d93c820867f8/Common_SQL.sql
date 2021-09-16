@@ -2406,16 +2406,284 @@ select f.ZDRID, to_char(f.SHOTTIME, 'yyyy'), count(*)
 from TBL_VIID_ZDR_FOOTPOINT f
 group by f.ZDRID, to_char(f.SHOTTIME, 'yyyy');
 
-select f.ZDRID, f.time, f.count, b.PLACECODE, b.XM, b.GMSFHM, b.XP
-from (select ZDRID, to_char(SHOTTIME, 'yyyy-mm') as time, count(*) as count
-from TBL_VIID_ZDR_FOOTPOINT
-group by ZDRID, to_char(SHOTTIME, 'yyyy-mm')) f left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID;
+select (select name from EQP_AREA where ID = substr(z.SBBM, 0, 6)) as XZQYNAME,
+       z.*
+from ZCGL_DEVICE z
+where substr(z.SBBM, 0, 6) like '610524%';
+
+select *
+from EQP_AREA
+where ID like '61';
+
+update ZCGL_DEVICE
+set TBZT = '11'
+where TBZT is null;
+
+
+with t1 as (select rpad(substr(SBBM, 0, 4), 6, 0) as placeCode, nvl(count(SBBM), 0) as pushTotal
+            from ZCGL_DEVICE_SOURCE
+            where substr(SBBM, 0, 4) like '61%'
+            group by substr(SBBM, 0, 4)),
+     t2 as (select rpad(substr(SBBM, 0, 4), 6, 0) as placeCode, nvl(count(distinct SBBM), 0) as accurateCount
+            from ZCGL_DEVICE_SOURCE
+            where substr(SBBM, 0, 4) like '61%'
+              and ASSERTSTATUS = '200'
+            group by substr(SBBM, 0, 4)),
+     t3 as (select count(*) as total, rpad(substr(SBBM, 0, 4), 6, 0) as placeCode
+            from ZCGL_DEVICE
+            where substr(SBBM, 0, 4) like '61%'
+            group by substr(SBBM, 0, 4))
+select name                                                                as xzqyName,
+       nvl(total, 0)                                                       as total,
+       nvl(pushTotal, 0)                                                   as pushTotal,
+       nvl(accurateCount, 0)                                               as accurateCount,
+       nvl((pushTotal - accurateCount), 0)                                 as inaccurateCount,
+       to_char(nvl(round((accurateCount / pushTotal), 4), 0) * 100) || '%' as accurateRate
+from (select rpad(e.id, 6, 0) as placeCode, e.NAME as name, t1.pushTotal, t2.accurateCount, t3.total
+      from EQP_AREA e
+               left join t1 on rpad(e.id, 6, 0) = t1.placeCode
+               left join t2 on rpad(e.id, 6, 0) = t2.placeCode
+               left join t3 on rpad(e.id, 6, 0) = t3.placeCode
+      where ID like '61%'
+        and length(ID) = 4)
+order by placeCode;
+
+alter table ZCGL_DEVICE_SOURCE
+    drop primary key;
+
+select *
+from ZCGL_DEVICE_SOURCE;
+
+select SBBM
+from ZCGL_DEVICE_SOURCE
+group by SBBM
+having count(SBBM) > 1;
+
+select *
+from ZCGL_DEVICE
+where MACDZ = '44:47:cc:8e:bc:a2';
+
+select count(mg.menuId)
+from commonMenugroup mg,
+     commonusergroup ug
+         left join commongroup cg
+                   on ug.groupid = cg.groupid
+where mg.groupId = ug.groupId
+  and mg.type = ug.type
+  and userId =#userId#
+  and mg.type = 'OMOA'
+  and mg.rightName = 'TSBJ';
+
+select mg.RIGHTNAME, count(mg.MENUID)
+from COMMONMENUGROUP mg,
+     COMMONUSERGROUP ug
+         left join COMMONGROUP cg
+                   on ug.GROUPID = cg.GROUPID
+where mg.GROUPID = ug.GROUPID
+  and mg.TYPE = ug.TYPE
+  and ug.USERID = '200000200000010001'
+  and mg.TYPE = 'OMOA'
+  and mg.RIGHTNAME = 'TSBJ'
+group by mg.RIGHTNAME;
+
+select mg.RIGHTNAME as rightName, count(mg.MENUID) as count
+from COMMONMENUGROUP mg,
+     COMMONUSERGROUP ug
+         left join COMMONGROUP cg on ug.GROUPID = cg.GROUPID
+where mg.GROUPID = ug.GROUPID
+  and mg.TYPE = ug.TYPE
+  and ug.USERID = '200000200000010001'
+  and mg.TYPE = 'OMOA'
+  and mg.RIGHTNAME = 'TSBJ'
+group by mg.RIGHTNAME
+union all
+select mg.RIGHTNAME as rightName, count(mg.MENUID) as count
+from COMMONMENUGROUP mg,
+     COMMONUSERGROUP ug
+         left join COMMONGROUP cg on ug.GROUPID = cg.GROUPID
+where mg.GROUPID = ug.GROUPID
+  and mg.TYPE = ug.TYPE
+  and ug.USERID = '200000200000010001'
+  and mg.TYPE = 'OMOA'
+  and mg.RIGHTNAME = 'QBTSBJ'
+group by mg.RIGHTNAME
+union all
+select mg.RIGHTNAME as rightName, count(mg.MENUID) as count
+from COMMONMENUGROUP mg,
+     COMMONUSERGROUP ug
+         left join COMMONGROUP cg on ug.GROUPID = cg.GROUPID
+where mg.GROUPID = ug.GROUPID
+  and mg.TYPE = ug.TYPE
+  and ug.USERID = '200000200000010001'
+  and mg.TYPE = 'OMOA'
+  and mg.RIGHTNAME = 'GXTBZT'
+group by mg.RIGHTNAME;
+
+
+
+select *
+from COMMONMENUGROUP
+where GROUPID = '6083520';
+
+select *
+from COMMONUSERGROUP
+where USERID = '200000200000010001';
+
+select *
+from GEUSERDOM
+where USERID = '200000200000010001';
+
+
+select q.NAME
+from tbl_viid_zdr_footpoint f
+         left join VIDEOINPUT v on f.deviceId = v.gat1400
+         left join eqp_area q on rpad(substr(f.deviceid, 0, 6), 6, '0') = rpad(q.id, 6, '0');
+
+select *
+from EQP_AREA
+where ID = '610403';
+
+select *
+from COMMONMENUGROUP
+where MENUID like '500030%'
+  and TYPE = 'OMOA';
+
+select *
+from CODEDETAIL
+where TYPEID = 'SXJCJQY';
+
+select row_number() over (partition by SBBM order by RKSJ desc) as seq
+from ZCGL_DEVICE;
+
+select distinct RKSJ
+from (select RKSJ, row_number() over (order by RKSJ desc) as seq from ZCGL_DEVICE)
+where seq = 1;
+
 
 select (select name from EQP_AREA where ID = substr(z.SBBM, 0, 6)) as XZQYNAME,
        z.*
-from ZCGL_DEVICE z where substr(z.SBBM, 0, 6) like '610524%';
+from ZCGL_DEVICE z
+where substr(z.SBBM, 0, 6) like '61' || '%'
+order by RKSJ desc;
+
+select to_number()
+from CODEDETAIL;
+
 
 select *
-from EQP_AREA where ID like '61';
+from COMMONGROUP
+where TYPE = 'ZCGL';
 
-update ZCGL_DEVICE set TBZT = '11' where TBZT is null;
+select *
+from COMMONGROUP
+where GROUPNAME = '地市版管理员';
+
+select *
+from COMMONGROUP
+where GROUPID like '6083537';
+
+select *
+from COMMONMENUGROUP
+where TYPE = 'ZCGL';
+
+select *
+from COMMONUSERGROUP
+where TYPE = 'ZCGL';
+
+select userid,
+       username,
+       emailaddr,
+       (select rolename from roleinfo where roleid = g.roleid) rolename
+from geuserdom g
+where not exists(
+        select 1
+        from commonusergroup cg
+        where cg.groupid = '6083547'
+          and cg.userid = g.userid
+          and cg.type = 'ZCGL'
+          and cg.usertype = 'ZCGL'
+    )
+  and g.roleid in (
+    select roleid
+    from roleinfo
+    where fullpath like (select fullpath from roleinfo where roleid = '610000000000002000') || '%'
+);
+
+select *
+from GEUSERDOM
+where USERID = '200000200000015184';
+
+select *
+from GEUSERDOM
+where EMAILADDR like 'admin001%';
+
+select *
+from ROLEINFO
+where ROLEID = '610000000000002000';
+
+select *
+from ROLEINFO;
+
+select *
+from roleinfo
+where fullpath like (select fullpath from roleinfo where roleid = '610000000000002000') || '%';
+
+select ZDRID
+from TBL_VIID_ZDR_FOOTPOINT
+group by ZDRID;
+
+select f.ZDRID,
+       f.count,
+       b.PLACECODE,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where rpad(ID, 6, 0) = rpad(b.PLACECODE, 6, 0)) as placeName
+from (select ZDRID, count(*) as count
+      from TBL_VIID_ZDR_FOOTPOINT
+      where SHOTTIME >= to_date('2020-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+        and AREACODE like '61%'
+      group by ZDRID) f
+         left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID;
+
+select t.SHOTTIME,
+       t.SIMILARITYDEGREE,
+       f.ZDRID,
+       nvl(f.count, 0)                                    as count,
+       b.PLACECODE,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = b.PLACECODE) as placeName
+from TBL_VIID_ZDR_BASICINFO b
+         left join (select ZDRID, count(*) as count
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+                      and AREACODE like '61%'
+                    group by ZDRID) f on b.ZDRID = f.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq, ZDRID, SHOTTIME, SIMILARITYDEGREE
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '张三%'
+--                       and IDNUMBER = ''
+             ) t
+                   on b.ZDRID = t.ZDRID and t.seq = 1;
+
+select name
+from EQP_AREA
+where rpad(ID, 6, 0) = rpad('6101', 6, 0);
+
+select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq, ZDRID, SHOTTIME
+from TBL_VIID_ZDR_FOOTPOINT;
+
+select *
+from TBL_VIID_ZDR_FOOTPOINT
+where ZDRID = '3_2020103014402200001'
+order by SHOTTIME desc;

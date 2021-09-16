@@ -360,32 +360,33 @@ from (select substr(SBBM, 0, 4) as placeCode, count(distinct SBBM) as accurateCo
       where substr(SBBM, 0, 4) like '61%'
       group by substr(SBBM, 0, 4));
 
-with t1 as (select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
-                   placeCode,
-                   nvl(pushTotal, 0)                                            as pushTotal
-            from (select substr(SBBM, 0, 6) as placeCode, count(SBBM) as pushTotal
-                  from ZCGL_DEVICE_SOURCE
-                  where substr(SBBM, 0, 6) like '610122%'
-                  group by substr(SBBM, 0, 6))),
-     t2 as (select (select name from EQP_AREA where ID = rpad(placeCode, 6, 0)) as xzqyName,
-                   placeCode,
-                   nvl(accurateCount, 0)                                        as accurateCount
-            from (select substr(SBBM, 0, 6) as placeCode, count(distinct SBBM) as accurateCount
-                  from ZCGL_DEVICE_SOURCE
-                  where substr(SBBM, 0, 6) like '610122%'
-                  group by substr(SBBM, 0, 6))),
-     t3 as (select count(*) as total, substr(SBBM, 0, 6) as placeCode
+with t1 as (select rpad(substr(SBBM, 0, 4), 6, 0) as placeCode, nvl(count(SBBM), 0) as pushTotal
+            from ZCGL_DEVICE_SOURCE
+            where substr(SBBM, 0, 4) like '61%'
+            group by substr(SBBM, 0, 4)),
+     t2 as (select rpad(substr(SBBM, 0, 4), 6, 0) as placeCode, nvl(count(distinct SBBM), 0) as accurateCount
+            from ZCGL_DEVICE_SOURCE
+            where substr(SBBM, 0, 4) like '61%'
+            group by substr(SBBM, 0, 4)),
+     t3 as (select count(*) as total, rpad(substr(SBBM, 0, 4), 6, 0) as placeCode
             from ZCGL_DEVICE
-            where substr(SBBM, 0, 6) like '610122%'
-            group by substr(SBBM, 0, 6))
-select xzqyName,
-       nvl(total, 0)                         as total,
-       pushTotal,
-       accurateCount,
-       (pushTotal - accurateCount)           as inaccurateTotal,
-       round((accurateCount / pushTotal), 2) as accurateRate
-from (select t1.xzqyName, t1.pushTotal, t2.accurateCount, t3.total
-      from t1
-               left outer join t2 on t1.placeCode = t2.placeCode
-               left outer join t3 on t2.placeCode = t3.placeCode);
+            where substr(SBBM, 0, 4) like '61%'
+            group by substr(SBBM, 0, 4))
+select name                                          as xzqyName,
+       nvl(total, 0)                                 as total,
+       nvl(pushTotal, 0)                             as pushTotal,
+       nvl(accurateCount, 0)                         as accurateCount,
+       nvl((pushTotal - accurateCount), 0)           as inaccurateTotal,
+       nvl(round((accurateCount / pushTotal), 2), 0) as accurateRate
+from (select e.NAME as name, t1.pushTotal, t2.accurateCount, t3.total
+      from EQP_AREA e
+               left join t1 on rpad(e.id, 6, 0) = t1.placeCode
+               left join t2 on rpad(e.id, 6, 0) = t2.placeCode
+               left join t3 on rpad(e.id, 6, 0) = t3.placeCode
+      where ID like '61%'
+        and length(ID) = 4);
+
+select count(*) from sms_auth where phone in ('18912341234','17312341234');
+
+alter table ZCGL_DEVICE add TSSJ date;
 
