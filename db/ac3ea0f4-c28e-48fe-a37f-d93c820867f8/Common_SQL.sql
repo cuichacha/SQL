@@ -2650,7 +2650,8 @@ from (select ZDRID, count(*) as count
          left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID;
 
 select t.SHOTTIME,
-       t.SIMILARITYDEGREE,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
        f.ZDRID,
        nvl(f.count, 0)                                    as count,
        b.PLACECODE,
@@ -2665,20 +2666,282 @@ from TBL_VIID_ZDR_BASICINFO b
                       and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
 --         and NAME like '张三%'
 --         and IDNUMBER = ''
-                      and AREACODE like '61%'
+                      and AREACODE like '610526%'
                     group by ZDRID) f on b.ZDRID = f.ZDRID
-         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq, ZDRID, SHOTTIME, SIMILARITYDEGREE
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SIMILARITYDEGREE,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
                     from TBL_VIID_ZDR_FOOTPOINT
                     where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
                       and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
 --                       and NAME like '张三%'
 --                       and IDNUMBER = ''
-             ) t
+) t
                    on b.ZDRID = t.ZDRID and t.seq = 1;
+
+
+select t.SHOTTIME,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
+       f.ZDRID,
+       nvl(f.count, 0)                                    as count,
+       f.PLACECODE,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = f.PLACECODE) as placeName
+from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+      from TBL_VIID_ZDR_FOOTPOINT
+      where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+        and AREACODE like '61%'
+      group by ZDRID, substr(AREACODE, 0, 4)) f
+         left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SIMILARITYDEGREE,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '张三%'
+--                       and IDNUMBER = ''
+) t
+                   on f.ZDRID = t.ZDRID and t.seq = 1;
+
+select t.SHOTTIME,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
+       f.ZDRID,
+       nvl(f.count, 0)                                    as count,
+       f.PLACECODE,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = f.PLACECODE) as placeName
+from (select ba.ZDRID, ba.XM, ba.GMSFHM, ba.XP, ba.RKLX
+      from TBL_VIID_ZDR_BASICINFO ba
+      where
+--   ba.XM like '张三%'
+--         and ba.IDNUMBER = ''
+--         and ba.RKLX = ''
+ba.PLACECODE like '61%') b
+         left join (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+                      and AREACODE like '61%'
+                    group by ZDRID, substr(AREACODE, 0, 4)) f on b.ZDRID = f.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '张三%'
+--                       and IDNUMBER = ''
+) t
+                   on f.ZDRID = t.ZDRID and t.seq = 1;
+
+
+
+select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+from TBL_VIID_ZDR_FOOTPOINT
+where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+  and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+  and AREACODE like '61%'
+group by ZDRID, substr(AREACODE, 0, 4);
+
+select row_number() over (partition by h.placeCode order by h.count) as seq, h.*
+from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+      from TBL_VIID_ZDR_FOOTPOINT
+      where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+        and AREACODE like '61%'
+      group by ZDRID, substr(AREACODE, 0, 4)) h;
+
+
+
+select t.SHOTTIME,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
+       f.ZDRID,
+       nvl(f.count, 0)                                    as count,
+       nvl(f.PLACECODE, substr(b.PLACECODE, 0, 4))        as placeCode,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = f.PLACECODE) as placeName
+from (select *
+      from (select ba.ZDRID,
+                   ba.XM,
+                   ba.GMSFHM,
+                   ba.XP,
+                   ba.RKLX,
+                   ba.PLACECODE,
+                   row_number() over (partition by placeCode order by PLACECODE) as seq
+            from TBL_VIID_ZDR_BASICINFO ba
+--             where ba.XM like '%张三%'
+--               and ba.GMSFHM like ''
+--               and ba.RKLX = ''
+            where ba.PLACECODE like '61%') bc
+      where bc.seq >= 0
+        and bc.seq <= 50) b
+         left join (select *
+                    from (select row_number() over (partition by h.placeCode order by h.count) as seq, h.*
+                          from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+                                from TBL_VIID_ZDR_FOOTPOINT
+                                where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                                  and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                                   and NAME like '%张三%'
+--                                   and IDNUMBER like ''
+                                  and AREACODE like '61%'
+                                group by ZDRID, substr(AREACODE, 0, 4)) h) f
+                    where f.seq >= 0
+                      and f.seq <= 50) f on f.ZDRID = b.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '%张三%'
+--                       and IDNUMBER like ''
+) t on f.ZDRID = t.ZDRID and t.seq = 1;
+
+
+-- 实际使用SQL
+select t.SHOTTIME,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
+       b.ZDRID,
+       nvl(f.count, 0)                                    as count,
+       nvl(f.PLACECODE, substr(b.PLACECODE, 0, 6))        as placeCode,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = b.placeCode) as placeName
+from (select *
+      from (select ba.ZDRID,
+                   ba.XM,
+                   ba.GMSFHM,
+                   ba.XP,
+                   ba.RKLX,
+                   substr(ba.PLACECODE, 0, 6)                                                     as placeCode,
+                   row_number() over (partition by substr(ba.PLACECODE, 0, 6) order by PLACECODE) as seq
+            from TBL_VIID_ZDR_BASICINFO ba
+--             where ba.XM like '%张三%'
+--               and ba.GMSFHM like ''
+--               and ba.RKLX = ''
+            where ba.PLACECODE like '6199%') bc
+      where bc.seq >= 0
+        and bc.seq <= 50) b
+         left join (select *
+                    from (select ZDRID, substr(AREACODE, 0, 6) as placeCode, count(ZDRID) as count
+                          from TBL_VIID_ZDR_FOOTPOINT
+                          where SHOTTIME >= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and SHOTTIME <= to_date('2021-10-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                                   and NAME like '%张三%'
+--                                   and IDNUMBER like ''
+                            and AREACODE like '6199%'
+                          group by substr(AREACODE, 0, 6), ZDRID)) f on f.ZDRID = b.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-10-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '%张三%'
+--                       and IDNUMBER like ''
+) t on f.ZDRID = t.ZDRID and t.seq = 1;
+
+
+
+select count(ZDRID)
+from TBL_VIID_ZDR_BASICINFO;
+
+select count(ZDRID), substr(PLACECODE, 0, 4) as placeCode
+from TBL_VIID_ZDR_BASICINFO
+where PLACECODE like '61%'
+group by substr(PLACECODE, 0, 4);
+
+
+select *
+from (select row_number() over (partition by h.placeCode order by h.count) as seq, h.*
+      from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+            from TBL_VIID_ZDR_FOOTPOINT
+            where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+              and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+              and AREACODE like '61%'
+            group by ZDRID, substr(AREACODE, 0, 4)) h) f
+where f.seq >= 0
+  and f.seq <= 1;
+
+select *
+from (select *
+      from (select row_number() over (partition by h.placeCode order by h.count) as seq, h.*
+            from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+                  from TBL_VIID_ZDR_FOOTPOINT
+                  where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                    and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+                    and AREACODE like '61%'
+                  group by ZDRID, substr(AREACODE, 0, 4)) h) f
+      where f.seq >= 0
+        and f.seq <= 50) f
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '张三%'
+--                       and IDNUMBER = ''
+) t on f.ZDRID = t.ZDRID and t.seq = 1;
+
+
+
+select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(*) as count
+from TBL_VIID_ZDR_FOOTPOINT
+where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+  and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--         and NAME like '张三%'
+--         and IDNUMBER = ''
+  and AREACODE like '61%'
+group by ZDRID, substr(AREACODE, 0, 4);
+
 
 select name
 from EQP_AREA
 where rpad(ID, 6, 0) = rpad('6101', 6, 0);
+
+select *
+from EQP_AREA
+where ID like '6101%';
 
 select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq, ZDRID, SHOTTIME
 from TBL_VIID_ZDR_FOOTPOINT;
@@ -2687,3 +2950,64 @@ select *
 from TBL_VIID_ZDR_FOOTPOINT
 where ZDRID = '3_2020103014402200001'
 order by SHOTTIME desc;
+
+select *
+from GEOPERATELOG;
+
+select *
+from CODEDETAIL
+where TYPEID = 'RKLX';
+
+
+select t.SHOTTIME,
+       t.SMALLIMAGEDATA                                   as photoData,
+       t.SMALLIMAGESTORAGEPATH                            as photoUrl,
+       b.ZDRID,
+       nvl(p.count, 0)                                    as count,
+       nvl(b.placeCode, 0)                                as placeCode,
+       b.XM,
+       b.GMSFHM,
+       b.XP,
+       (select name from EQP_AREA where ID = b.placeCode) as placeName
+from (select *
+      from (select ba.ZDRID,
+                   ba.XM,
+                   ba.GMSFHM,
+                   ba.XP,
+                   ba.RKLX,
+                   substr(placeCode, 0, 6)                                                     as placeCode,
+                   row_number() over (partition by substr(placeCode, 0, 6) order by PLACECODE) as seq
+            from TBL_VIID_ZDR_BASICINFO ba
+--             where ba.XM like '%张三%'
+--               and ba.GMSFHM like ''
+--               and ba.RKLX = ''
+            where ba.PLACECODE like '6101%') bc
+      where bc.seq >= 0
+        and bc.seq <= 50) b
+         left join (select ZDRID, DATECOUNT as count
+                    from TBL_VIID_ZDR_PCFX
+                    where ACTIVITYDATE >= '20210101'
+                      and ACTIVITYDATE <= '20210909') p on b.ZDRID = p.ZDRID
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+--                       and NAME like '%张三%'
+--                       and IDNUMBER like ''
+) t on p.ZDRID = t.ZDRID and t.seq = 1;
+
+
+select v.id     as               id,
+       v.name,
+       v.parent as               parent,
+       (select count(*)
+        from eqp_area t
+        where t.parent = v.id
+          and length(t.id) <= 8) childrenCount
+from eqp_area v
+where (rtrim(v.parent, '0') like '6101' || '%' or rtrim(v.id, '0') = '6101')
+  and length(v.id) <= 8;

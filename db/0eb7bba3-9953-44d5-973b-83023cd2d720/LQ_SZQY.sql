@@ -95,12 +95,12 @@ from ROLEINFO r1,
              SUM(GASPRICE)                         as gasTotalPrice,
              ROUND(SUM(GASPRICE) / SUM(GASNUM), 2) as gasAveragePrice
       from GASSTATION_PURCHASE_HISTORY gph
-      where exists(select 1
+      where gph.GASTYPE = '汽油'
+        and gph.CREATEDATE >= TO_DATE('2019-02-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+        and gph.CREATEDATE <= TO_DATE('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
+        and exists(select 1
                    from ROLEINFO r2
                    where gph.STATIONID = r2.ROLEID
-                     and gph.GASTYPE = '汽油'
-                     and gph.CREATEDATE >= TO_DATE('2019-02-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
-                     and gph.CREATEDATE <= TO_DATE('2021-05-19 00:00:00', 'yyyy-mm-dd hh24:mi:ss')
                      and r2.FULLPATH like (select r3.FULLPATH
                                            from ROLEINFO r3
                                            where r3.ROLEID = '12345') || '%')

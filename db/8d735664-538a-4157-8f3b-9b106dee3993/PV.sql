@@ -389,4 +389,26 @@ from (select e.NAME as name, t1.pushTotal, t2.accurateCount, t3.total
 select count(*) from sms_auth where phone in ('18912341234','17312341234');
 
 alter table ZCGL_DEVICE add TSSJ date;
+update ZCGL_DEVICE set TSSJ = sysdate where TBZT = 1;
+
+select IP
+from ZCGL_DEVICE where IP = '10.80.0.120' and SBBM != '61012299001310000028';
+
+
+select *
+from ZCGL_DEVICE;
+
+select *
+from ZCGL_DEVICE where SBBM = '61012299001310000028' and SBMC = '政府门外1'
+union
+select *
+from ZCGL_DEVICE where SBBM = '61010257001310433276' and SBMC = '八府庄商业街八府活动中心全北';
+
+select *
+from ZCGL_DEVICE where SXJGNLX like '%3/1%';
+
+alter table zcgl_device_source modify ASSERTSTATUS varchar2(1000);
+
+select MACDZ
+from ZCGL_DEVICE_SOURCE where MACDZ in ('4C:BD:8F:E3:94:30');
 
