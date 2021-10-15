@@ -450,6 +450,7 @@ select *
 from tb_st_asj t
 where exists(select 1 from code_ajlb ca where ca.code = t.ajlbdm and ca.isxgxsaj = 1);
 
+-- 实际使用
 select p.*,
        q.zlas,
        q.xsajs,
@@ -458,6 +459,10 @@ select p.*,
        q.qd,
        q.dq,
        q.fjcxzp,
+       q.XGAJ,
+       q.XSCTQC,
+       q.ZACTQC,
+       q.ZACTQC,
        decode(q.zlas, 0, 0, (round(p.cjs / q.zlas, 4)) * 100)          zcll,
        decode(q.xsajs, 0, 0, (round(p.xsaj / q.xsajs, 4)) * 100)       xsajcll,
        decode(q.ctxsajs, 0, 0, (round(p.ctxsaj / q.ctxsajs, 4)) * 100) ctxsajcll,

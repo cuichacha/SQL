@@ -2850,17 +2850,17 @@ from (select *
 --             where ba.XM like '%张三%'
 --               and ba.GMSFHM like ''
 --               and ba.RKLX = ''
-            where ba.PLACECODE like '6199%') bc
+            where ba.PLACECODE like '6104%') bc
       where bc.seq >= 0
         and bc.seq <= 50) b
          left join (select *
                     from (select ZDRID, substr(AREACODE, 0, 6) as placeCode, count(ZDRID) as count
                           from TBL_VIID_ZDR_FOOTPOINT
                           where SHOTTIME >= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
-                            and SHOTTIME <= to_date('2021-10-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
 --                                   and NAME like '%张三%'
 --                                   and IDNUMBER like ''
-                            and AREACODE like '6199%'
+                            and AREACODE like '6104%'
                           group by substr(AREACODE, 0, 6), ZDRID)) f on f.ZDRID = b.ZDRID
          left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
                            ZDRID,
@@ -2869,7 +2869,7 @@ from (select *
                            SMALLIMAGESTORAGEPATH
                     from TBL_VIID_ZDR_FOOTPOINT
                     where SHOTTIME >= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
-                      and SHOTTIME <= to_date('2021-10-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
 --                       and NAME like '%张三%'
 --                       and IDNUMBER like ''
 ) t on f.ZDRID = t.ZDRID and t.seq = 1;
@@ -3011,3 +3011,107 @@ select v.id     as               id,
 from eqp_area v
 where (rtrim(v.parent, '0') like '6101' || '%' or rtrim(v.id, '0') = '6101')
   and length(v.id) <= 8;
+
+
+select count(ZDRID) as count, PLACECODE as placeCode
+from TBL_VIID_ZDR_BASICINFO
+where PLACECODE like '61%'
+group by PLACECODE;
+
+select count(zdrId) as count, placeCode
+from (select distinct b.ZDRID as zdrId, substr(f.AREACODE, 0, 6) as placeCode
+      from TBL_VIID_ZDR_BASICINFO b
+               left join TBL_VIID_ZDR_FOOTPOINT f on b.ZDRID = f.ZDRID
+      where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and substr(f.AREACODE, 0, 6) like '6105%')
+group by placeCode;
+
+select count(b.zdrId) as count, placeCode
+from (select ZDRID from TBL_VIID_ZDR_BASICINFO where substr(PLACECODE, 0, 4) like '61%') b
+         left join (select distinct ZDRID, substr(AREACODE, 0, 4) as placeCode
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and substr(AREACODE, 0, 4) like '61%') f on b.ZDRID = f.ZDRID
+group by f.placeCode;
+
+
+select count(b.zdrId) as count, placeCode
+from (select distinct ZDRID, substr(AREACODE, 0, 4) as placeCode
+      from TBL_VIID_ZDR_FOOTPOINT
+      where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+        and substr(AREACODE, 0, 4) like '61%') f
+         left join (select ZDRID from TBL_VIID_ZDR_BASICINFO where substr(PLACECODE, 0, 4) like '61%') b
+                   on b.ZDRID = f.ZDRID
+group by f.placeCode;
+
+select e.id, nvl(b.count, 0) as totalCount
+from (select ID
+      from eqp_area
+      where rpad(id, 8, '0') = rpad('61', 8, '0')
+         or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+         left join (select count(ZDRID) as count, substr(PLACECODE, 0, 4) as placeCode
+                    from TBL_VIID_ZDR_BASICINFO
+                    where substr(PLACECODE, 0, 4) like '61%'
+                    group by substr(PLACECODE, 0, 4)) b on e.id = b.placeCode
+order by e.ID;
+
+
+select e.id, nvl(t.count, 0) as hasDataCount
+from (select ID
+      from eqp_area
+      where rpad(id, 8, '0') = rpad('61', 8, '0')
+         or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+         left join (select count(b.zdrId) as count, placeCode
+                    from (select distinct ZDRID, substr(AREACODE, 0, 4) as placeCode
+                          from TBL_VIID_ZDR_FOOTPOINT
+                          where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and substr(AREACODE, 0, 4) like '61%') f
+                             left join (select ZDRID
+                                        from TBL_VIID_ZDR_BASICINFO
+                                        where substr(PLACECODE, 0, 4) like '61%') b
+                                       on b.ZDRID = f.ZDRID
+                    group by f.placeCode) t
+                   on e.id = t.placeCode
+order by e.ID;
+
+-- 统计数字
+select t1.id                                        as placeCode,
+       greatest(t1.totalCount, t2.hasDataCount)     as totalCount,
+       t2.hasDataCount,
+       greatest(t1.totalCount - t2.hasDataCount, 0) as noDataCount
+from (select e.id, nvl(b.count, 0) as totalCount
+      from (select ID
+            from eqp_area
+            where rpad(id, 8, '0') = rpad('61', 8, '0')
+               or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+               left join (select count(ZDRID) as count, substr(PLACECODE, 0, 4) as placeCode
+                          from TBL_VIID_ZDR_BASICINFO
+                          where substr(PLACECODE, 0, 4) like '61%'
+                          group by substr(PLACECODE, 0, 4)) b on e.id = b.placeCode
+      order by e.ID) t1
+         left join (select e.id, nvl(t.count, 0) as hasDataCount
+                    from (select ID
+                          from eqp_area
+                          where rpad(id, 8, '0') = rpad('61', 8, '0')
+                             or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+                             left join (select count(b.zdrId) as count, placeCode
+                                        from (select distinct ZDRID, substr(AREACODE, 0, 4) as placeCode
+                                              from TBL_VIID_ZDR_FOOTPOINT
+                                              where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                                                and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                                                and substr(AREACODE, 0, 4) like '61%') f
+                                                 left join (select ZDRID
+                                                            from TBL_VIID_ZDR_BASICINFO
+                                                            where substr(PLACECODE, 0, 4) like '61%') b
+                                                           on b.ZDRID = f.ZDRID
+                                        group by f.placeCode) t
+                                       on e.id = t.placeCode
+                    order by e.ID) t2 on t1.ID = t2.ID;
+
+
+select *
+from CODEDETAIL where TYPEID like 'Attention%';
