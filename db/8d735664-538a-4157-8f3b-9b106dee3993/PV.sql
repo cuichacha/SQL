@@ -425,6 +425,23 @@ alter table zcgl_device_source
 select MACDZ, instr(MACDZ, '8C')
 from ZCGL_DEVICE_SOURCE;
 
+select nvl(s.count, 0)                                                                as total,
+       nvl(t.count, 0)                                                                as localCount,
+       nvl((s.count - t.count), 0)                                                    as outSideCount,
+       s.PEOPLETYPE                                                                   as peopleType,
+       (select CNT from CODEDETAIL where TYPEID = 'PeopleType' and ID = s.PEOPLETYPE) as peopleTypeName
+from (select count(*) as count, PEOPLETYPE
+      from ZDRINFO
+      group by PEOPLETYPE) s
+         left join
+     (select count(*) as count, PEOPLETYPE
+      from ZDRINFO
+      where instr(TAGS, '本地') > 0
+      group by PEOPLETYPE) t on s.PEOPLETYPE = t.PEOPLETYPE;
+
+alter table ZDRINFO
+    MODIFY EDUCATION varchar2(2);
+
 create table ZDRINFO
 (
     ID             varchar2(20) primary key not null,
@@ -447,11 +464,7 @@ create table ZDRINFO
     UPDATETIME     DATE,
     PHOTO          CLOB,
     TAGS           VARCHAR2(1000),
-    RELEVANTISSUE  VARCHAR2(100),
-    VISITRECORD    VARCHAR2(100),
-    FOLLOWUP       VARCHAR2(100),
-    ISDELETE       VARCHAR2(2) default 0,
-    FOCUS          VARCHAR2(100)
+    ISDELETE       VARCHAR2(2) default 0
 );
 
 comment on column ZDRINFO.ID is '主键ID';
@@ -474,16 +487,14 @@ comment on column ZDRINFO.CREATETIME is '创建时间';
 comment on column ZDRINFO.UPDATETIME is '更新时间';
 comment on column ZDRINFO.PHOTO is '照片';
 comment on column ZDRINFO.TAGS is '标签';
-comment on column ZDRINFO.RELEVANTISSUE is '相关警情ID，;分隔';
-comment on column ZDRINFO.VISITRECORD is '走访记录ID，;分隔';
-comment on column ZDRINFO.FOLLOWUP is '跟进信息ID，;分隔';
 comment on column ZDRINFO.ISDELETE is '是否删除 1已删除 0未删除';
-comment on column ZDRINFO.FOCUS is '关注账号ID，;分隔';
 
+drop table VISITRECORD;
 
 create table VISITRECORD
 (
     ID         varchar2(20) primary key not null,
+    ZDRID      varchar2(20),
     SUPERVISOR varchar2(100),
     ADDRESS    varchar2(1000),
     CONTENT    varchar2(4000),
@@ -491,8 +502,199 @@ create table VISITRECORD
 );
 
 comment on column VISITRECORD.ID is '主键ID';
+comment on column VISITRECORD.ZDRID is '重点人ID';
 comment on column VISITRECORD.SUPERVISOR is '负责人';
 comment on column VISITRECORD.ADDRESS is '地点';
 comment on column VISITRECORD.CONTENT is '内容';
 comment on column VISITRECORD.VISITTIME is '时间';
 
+
+select *
+from CODEDETAIL
+where TYPEID = 'Tags';
+
+select wm_concat(c.CNT) as cnt
+from ZDRINFO z,
+     CODEDETAIL c
+where z.ID = '2002'
+  and c.TYPEID = 'Tags'
+  and instr(',' || z.TAGS || ',', ',' || c.ID || ',') > 0;
+
+select z.ID,
+       z.IDNUMBER,
+       z.NAME,
+       z.GENDER,
+       z.ETHNICITY,
+       z.ATTENTIONLEVEL,
+       z.PEOPLETYPE,
+       z.PHONE,
+       z.BIRTH,
+       z.ADDRESS,
+       z.POLICETYPE,
+       z.EDUCATION,
+       z.OCCUPATION,
+       z.DUTYUNIT,
+       z.POLICE,
+       z.POLICEPHONE,
+       z.CREATETIME,
+       z.UPDATETIME,
+       z.PHOTO,
+       z.TAGS,
+       z.ISDELETE,
+       (select CNT from CODEDETAIL where TYPEID = 'GenderCode' and ID = z.GENDER)             as genderName,
+       (select CNT from CODEDETAIL where TYPEID = 'EthicCode' and ID = z.ETHNICITY)           as ethnicityName,
+       (select CNT from CODEDETAIL where TYPEID = 'AttentionLevel' and ID = z.ATTENTIONLEVEL) as attentionLevelName,
+       (select CNT from CODEDETAIL where TYPEID = 'PeopleType' and ID = z.PEOPLETYPE)         as peopleTypeName,
+       (select CNT from CODEDETAIL where TYPEID = 'PoliceType' and ID = z.POLICETYPE)         as policeTypeName,
+       (select CNT from CODEDETAIL where TYPEID = 'Education' and ID = z.EDUCATION)           as educationName,
+       (select wm_concat(c.CNT)
+        from CODEDETAIL c
+        where c.TYPEID = 'Tags'
+          and instr(',' || z.TAGS || ',', ',' || c.ID || ',') > 0
+       )                                                                                      as tagName,
+       (select count(*) from jqInfo where jqbh = ID)                                          as issueCount
+from ZDRINFO z;
+
+select JQBH
+from JQFOLLOW
+where FOLLOWER = 'admin001@zjtek.com';
+
+select count(*) as count
+from ZDRINFO
+where ISDELETE = 1
+union all
+select count(*) as count
+from ZDRINFO
+where exists(select JQBH
+             from JQFOLLOW
+             where FOLLOWER = 'admin001@zjtek.com'
+               and ID = JQBH);
+
+drop table ZDRJQINFO;
+
+create table ZDRJQINFO
+(
+    ZDRID    varchar2(20),
+    JQINFOID varchar2(20),
+    CONSTRAINT ZDR_JQ PRIMARY KEY (ZDRID, JQINFOID)
+);
+
+comment on column ZDRJQINFO.ZDRID is '重点人Id';
+comment on column ZDRJQINFO.JQINFOID is '警情Id';
+
+
+select *
+from JQINFO j
+where exists(select 1
+             from (select JQINFOID
+                   from ZDRJQINFO
+                   where ZDRID = '2002') z
+             where j.ID = z.JQINFOID);
+
+insert into ZDRJQINFO (ZDRID, JQINFOID)
+VALUES ('3001', '5001');
+
+select *
+from ZDRINFO
+where EXISTS(select 1 from JQFOLLOW where FOLLOWER = 'admin001@zjtek.com' and ID = JQBH);
+
+select wm_concat(c.CNT)
+from CODEDETAIL c
+where c.TYPEID = 'Tags'
+  and instr(',' || '1,2' || ',', ',' || c.ID || ',') > 0;
+
+select wm_concat(c.CNT)
+from CODEDETAIL c
+where c.TYPEID = 'Tags'
+  and instr(',' || '1,2' || ',', ',' || c.ID || ',') > 0;
+
+select wm_concat(c.ID)
+from CODEDETAIL c
+where instr(',' || '重点,一般' || ',', ',' || c.CNT || ',') > 0;
+
+select ID,
+       IDNUMBER,
+       NAME,
+       GENDER,
+       ETHNICITY,
+       ATTENTIONLEVEL,
+       PEOPLETYPE,
+       PHONE,
+       BIRTH,
+       ADDRESS,
+       POLICETYPE,
+       EDUCATION,
+       OCCUPATION,
+       DUTYUNIT,
+       POLICE,
+       POLICEPHONE,
+       CREATETIME,
+       UPDATETIME,
+       PHOTO,
+       TAGS,
+       ISDELETE
+from ZDRINFO;
+
+select j.*,
+       (select CNT from codedetail c where c.ID = j.DEAL and TYPEID = 'jqInfoDeal')   dealcn,
+       (select CNT from codedetail c where c.ID = j.JQLBDM and TYPEID = 'jqInfoJqLb') jqlbCN,
+       (select CNT from codedetail c where c.ID = j.JQLXDM and TYPEID = 'jqInfoJqLx') JqlxCN,
+       (select CNT from codedetail c where c.ID = j.JQXLDM and TYPEID = 'jqInfoJqXl') jqxlCN,
+       decode(STATUS, 0, '未结', 1, '已结')                                               statuscn
+from JQINFO j
+where not exists(select JQINFOID
+                 from ZDRJQINFO
+                 where ZDRID = '4001'
+                   and j.ID = JQINFOID)
+order by CREATETIME desc;
+
+delete
+from ZCGL_DEVICE;
+
+update ZCGL_DEVICE
+set TBZT = '11'
+where TBZT = '2';
+commit;
+
+update ZCGL_DEVICE
+set TBZT = '2',
+    SBZT = '2'
+where substr(SBBM, 0, 2) != '61';
+
+select *
+from ZCGL_DEVICE
+where TBZT is null
+   or to_number(TBZT) < 10;
+
+select *
+from ZCGL_DEVICE
+where instr('/' || 'A0101/A0102' || '/', '/' || ZCGL_DEVICE.SXJCJQY || '/') > 0;
+
+create table KEYDEVICE
+(
+    SBBM         varchar2(20) primary key not null,
+    REPORTSTATUS varchar2(2) default '0',
+    CREATETIME   date        default sysdate,
+    REPORTTIME   date
+);
+
+drop table KEYDEVICE;
+
+-- 新增重点设备查询
+select *
+from ZCGL_DEVICE z
+where to_number(z.TBZT) > 10
+  and instr('/' || 'A0101/A0102' || '/', '/' || z.SXJCJQY || '/') > 0
+  and not exists(select SBBM from KEYDEVICE k where z.SBBM = k.SBBM);
+
+-- 重点设备管理查询
+select k.REPORTSTATUS,
+       k.REPORTTIME,
+       z.*,
+       (select instr('/' || 'A0101/A0102' || '/', '/' || z.SXJCJQY || '/') from DUAL) as isKeyDevice
+from KEYDEVICE k
+         left join ZCGL_DEVICE z on k.SBBM = z.SBBM;
+
+select *
+from KEYDEVICE
+where REPORTSTATUS = '0';

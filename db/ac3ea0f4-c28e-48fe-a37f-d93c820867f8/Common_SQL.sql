@@ -2827,13 +2827,13 @@ from (select *
 ) t on f.ZDRID = t.ZDRID and t.seq = 1;
 
 
--- 实际使用SQL
+-- 重点人大数据统计
 select t.SHOTTIME,
        t.SMALLIMAGEDATA                                   as photoData,
        t.SMALLIMAGESTORAGEPATH                            as photoUrl,
        b.ZDRID,
        nvl(f.count, 0)                                    as count,
-       nvl(f.PLACECODE, substr(b.PLACECODE, 0, 6))        as placeCode,
+       nvl(f.PLACECODE, substr(b.PLACECODE, 0, 4))        as placeCode,
        b.XM,
        b.GMSFHM,
        b.XP,
@@ -2844,24 +2844,24 @@ from (select *
                    ba.GMSFHM,
                    ba.XP,
                    ba.RKLX,
-                   substr(ba.PLACECODE, 0, 6)                                                     as placeCode,
-                   row_number() over (partition by substr(ba.PLACECODE, 0, 6) order by PLACECODE) as seq
+                   substr(ba.PLACECODE, 0, 4)                                                     as placeCode,
+                   row_number() over (partition by substr(ba.PLACECODE, 0, 4) order by PLACECODE) as seq
             from TBL_VIID_ZDR_BASICINFO ba
 --             where ba.XM like '%张三%'
 --               and ba.GMSFHM like ''
 --               and ba.RKLX = ''
-            where ba.PLACECODE like '6104%') bc
+            where ba.PLACECODE like '61%') bc
       where bc.seq >= 0
         and bc.seq <= 50) b
          left join (select *
-                    from (select ZDRID, substr(AREACODE, 0, 6) as placeCode, count(ZDRID) as count
+                    from (select ZDRID, substr(AREACODE, 0, 4) as placeCode, count(ZDRID) as count
                           from TBL_VIID_ZDR_FOOTPOINT
                           where SHOTTIME >= to_date('2021-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
                             and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
 --                                   and NAME like '%张三%'
 --                                   and IDNUMBER like ''
-                            and AREACODE like '6104%'
-                          group by substr(AREACODE, 0, 6), ZDRID)) f on f.ZDRID = b.ZDRID
+                            and AREACODE like '61%'
+                          group by substr(AREACODE, 0, 4), ZDRID)) f on f.ZDRID = b.ZDRID
          left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
                            ZDRID,
                            SHOTTIME,
@@ -3078,7 +3078,6 @@ from (select ID
                    on e.id = t.placeCode
 order by e.ID;
 
--- 统计数字
 select t1.id                                        as placeCode,
        greatest(t1.totalCount, t2.hasDataCount)     as totalCount,
        t2.hasDataCount,
@@ -3112,6 +3111,224 @@ from (select e.id, nvl(b.count, 0) as totalCount
                                        on e.id = t.placeCode
                     order by e.ID) t2 on t1.ID = t2.ID;
 
+select substr(PLACECODE, 0, 4) as placeCode, count(b.ZDRID)
+from (
+         select ZDRID
+         from TBL_VIID_ZDR_FOOTPOINT
+         group by ZDRID
+         having count(ZDRID) > 0) f
+         left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID
+group by substr(b.PLACECODE, 0, 4);
 
-select *
-from CODEDETAIL where TYPEID like 'Attention%';
+-- 统计数字1
+with t1 as (select e.id, nvl(b.count, 0) as totalCount
+            from (select ID
+                  from eqp_area
+                  where rpad(id, 8, '0') = rpad('61', 8, '0')
+                     or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+                     left join (select count(ZDRID) as count, substr(PLACECODE, 0, 4) as placeCode
+                                from TBL_VIID_ZDR_BASICINFO
+                                where substr(PLACECODE, 0, 4) like '61%'
+                                group by substr(PLACECODE, 0, 4)) b on e.id = b.placeCode
+            order by e.ID),
+     t2 as
+         (select e.id, nvl(t.count, 0) as count
+          from (select ID
+                from eqp_area
+                where rpad(id, 8, '0') = rpad('61', 8, '0')
+                   or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+                   left join (
+              select count(f.ZDRID) as count, substr(b.PLACECODE, 0, 4) as placeCode
+              from (select ZDRID
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                    group by ZDRID
+                    having count(ZDRID) > 0) f
+                       left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID
+              where substr(b.PLACECODE, 0, 4) like '61%'
+              group by substr(b.PLACECODE, 0, 4)) t on e.ID = t.placeCode
+          order by e.ID)
+select t1.id                      as placeCode,
+       t1.totalCount              as totalCount,
+       t2.count                   as hasDataCount,
+       (t1.totalCount - t2.count) as noDataCount
+from t1
+         left join t2 on t1.ID = t2.ID;
+
+-- 统计数字2
+with t1 as (select e.id, nvl(b.count, 0) as totalCount
+            from (select ID
+                  from eqp_area
+                  where rpad(id, 8, '0') = rpad('61', 8, '0')
+                     or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+                     left join (select count(ZDRID) as count, substr(PLACECODE, 0, 4) as placeCode
+                                from TBL_VIID_ZDR_BASICINFO
+                                where substr(PLACECODE, 0, 4) like '61%'
+                                group by substr(PLACECODE, 0, 4)) b on e.id = b.placeCode
+            order by e.ID),
+     t2 as
+         (select e.id, nvl(t.count, 0) as count
+          from (select ID
+                from eqp_area
+                where rpad(id, 8, '0') = rpad('61', 8, '0')
+                   or rpad(parent, 8, '0') = rpad('61', 8, '0')) e
+                   left join (
+              select count(f.ZDRID) as count, substr(b.PLACECODE, 0, 4) as placeCode
+              from (select ZDRID
+                    from TBL_VIID_ZDR_PCFX p
+                    where ACTIVITYDATE >= 20190805
+                      and ACTIVITYDATE <= 20211205
+                    group by ZDRID
+                   ) f
+                       left join TBL_VIID_ZDR_BASICINFO b on f.ZDRID = b.ZDRID
+              where substr(b.PLACECODE, 0, 4) like '61%'
+              group by substr(b.PLACECODE, 0, 4)) t on e.ID = t.placeCode
+          order by e.ID)
+select t1.id                      as placeCode,
+       t1.totalCount              as totalCount,
+       t2.count                   as hasDataCount,
+       (t1.totalCount - t2.count) as noDataCount
+from t1
+         left join t2 on t1.ID = t2.ID;
+
+
+-- 重点人大数据统计1
+with t as (select *
+           from (select b.ZDRID,
+                        b.XM,
+                        b.GMSFHM,
+                        b.XP,
+                        b.RKLX,
+                        b.placeCode,
+                        nvl(f1.count, 0)                                               as count,
+                        row_number() over (partition by b.placeCode order by f1.count) as seq
+                 from (select ZDRID, XM, GMSFHM, XP, RKLX, substr(PLACECODE, 0, 4) as placeCode
+                       from TBL_VIID_ZDR_BASICINFO
+                       where substr(PLACECODE, 0, 4) like '61%') b
+                          left join (
+                     select ZDRID, count(ZDRID) as count
+                     from TBL_VIID_ZDR_FOOTPOINT
+                     where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                       and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                     group by ZDRID
+                 ) f1 on b.ZDRID = f1.ZDRID)
+           where seq > 0
+             and seq <= 50)
+
+select t.ZDRID,
+       t.count,
+       t.placeCode,
+       t.seq,
+       t.XM,
+       t.GMSFHM,
+       t.RKLX,
+       t.XP,
+       f2.SHOTTIME,
+       f2.SMALLIMAGEDATA        as photoData,
+       f2.SMALLIMAGESTORAGEPATH as photoUrl
+from t
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')) f2
+                   on t.ZDRID = f2.ZDRID and f2.seq = 1;
+
+
+-- 重点人大数据统计2
+with t as (select *
+            from (select b.ZDRID,
+                         b.XM,
+                         b.GMSFHM,
+                         b.XP,
+                         b.RKLX,
+                         b.placeCode,
+                         nvl(f.count, 0)                                               as count,
+                         row_number() over (partition by b.placeCode order by f.count) as seq
+                  from (select ZDRID, XM, GMSFHM, XP, RKLX, substr(PLACECODE, 0, 4) as placeCode
+                        from TBL_VIID_ZDR_BASICINFO
+                        where substr(PLACECODE, 0, 4) like '61%') b
+                           left join (
+                      select ZDRID, SUM(DATECOUNT) as count
+                      from TBL_VIID_ZDR_PCFX p
+                      where ACTIVITYDATE >= 20190805
+                        and ACTIVITYDATE <= 20211205
+                      group by ZDRID
+                  ) f on b.ZDRID = f.ZDRID)
+            where seq > 0
+              and seq <= 50)
+
+select t.ZDRID,
+       t.count,
+       t.placeCode,
+       t.seq,
+       t.XM,
+       t.GMSFHM,
+       t.RKLX,
+       t.XP,
+       t2.SHOTTIME,
+       t2.SMALLIMAGEDATA        as photoData,
+       t2.SMALLIMAGESTORAGEPATH as photoUrl
+from t
+         left join (select *
+                    from (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                                 ZDRID,
+                                 SHOTTIME,
+                                 SMALLIMAGEDATA,
+                                 SMALLIMAGESTORAGEPATH
+                          from TBL_VIID_ZDR_FOOTPOINT
+                          where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss'))
+                    where seq = 1) t2 on t.ZDRID = t2.ZDRID;
+
+
+select ZDRID, SUM(DATECOUNT)
+from TBL_VIID_ZDR_PCFX
+group by ZDRID;
+
+
+with v as (select *
+           from (
+                    select b.ZDRID,
+                           f1.count,
+                           substr(b.PLACECODE, 0, 4)                                                    as placeCode,
+                           b.XM,
+                           b.GMSFHM,
+                           b.XP,
+                           b.RKLX,
+                           row_number() over (partition by substr(b.PLACECODE, 0, 4) order by f1.count) as seq
+                    from (select ZDRID, count(ZDRID) as count
+                          from TBL_VIID_ZDR_FOOTPOINT
+                          where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                            and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                          group by ZDRID
+                          having count(ZDRID) = 0
+                         ) f1
+                             left join TBL_VIID_ZDR_BASICINFO b on f1.ZDRID = b.ZDRID
+                    where substr(b.PLACECODE, 0, 4) like '61%') t
+           where t.seq > 0
+             and t.seq <= 50)
+select v.ZDRID,
+       v.count,
+       v.placeCode,
+       v.XM,
+       v.GMSFHM,
+       v.RKLX,
+       v.XP,
+       f2.SHOTTIME,
+       f2.SMALLIMAGEDATA,
+       f2.SMALLIMAGESTORAGEPATH
+from v
+         left join (select row_number() over (partition by ZDRID order by SHOTTIME desc) as seq,
+                           ZDRID,
+                           SHOTTIME,
+                           SMALLIMAGEDATA,
+                           SMALLIMAGESTORAGEPATH
+                    from TBL_VIID_ZDR_FOOTPOINT
+                    where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
+                      and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')) f2
+                   on v.ZDRID = f2.ZDRID and f2.seq = 1;
