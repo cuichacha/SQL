@@ -3332,3 +3332,6 @@ from v
                     where SHOTTIME >= to_date('2019-08-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')
                       and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')) f2
                    on v.ZDRID = f2.ZDRID and f2.seq = 1;
+
+select *
+from ROLEINFO where ROLEID = '200000200000011197';

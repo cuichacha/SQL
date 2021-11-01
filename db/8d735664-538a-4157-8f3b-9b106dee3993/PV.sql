@@ -670,13 +670,19 @@ select *
 from ZCGL_DEVICE
 where instr('/' || 'A0101/A0102' || '/', '/' || ZCGL_DEVICE.SXJCJQY || '/') > 0;
 
+drop table KEYDEVICE;
+
 create table KEYDEVICE
 (
     SBBM         varchar2(20) primary key not null,
-    REPORTSTATUS varchar2(2) default '0',
-    CREATETIME   date        default sysdate,
+    REPORTSTATUS number default 0,
+    CREATETIME   date   default sysdate,
     REPORTTIME   date
 );
+comment on column KEYDEVICE.SBBM is '设备编码';
+comment on column KEYDEVICE.REPORTSTATUS is '上报状态，0-未上报，1-已上报';
+comment on column KEYDEVICE.CREATETIME is '创建时间';
+comment on column KEYDEVICE.REPORTTIME is '上报时间';
 
 drop table KEYDEVICE;
 
@@ -684,8 +690,10 @@ drop table KEYDEVICE;
 select *
 from ZCGL_DEVICE z
 where to_number(z.TBZT) > 10
-  and instr('/' || 'A0101/A0102' || '/', '/' || z.SXJCJQY || '/') > 0
-  and not exists(select SBBM from KEYDEVICE k where z.SBBM = k.SBBM);
+    and instr('/' || z.SXJCJQY || '/', '/' || 'A0101/A0102' || '/') > 0
+   or instr('/' || z.SXJCJQY || '/', '/' || 'A0101' || '/') > 0
+   or instr('/' || z.SXJCJQY || '/', '/' || 'A0102' || '/') > 0
+    and not exists(select SBBM from KEYDEVICE k where z.SBBM = k.SBBM);
 
 -- 重点设备管理查询
 select k.REPORTSTATUS,
@@ -693,8 +701,62 @@ select k.REPORTSTATUS,
        z.*,
        (select instr('/' || 'A0101/A0102' || '/', '/' || z.SXJCJQY || '/') from DUAL) as isKeyDevice
 from KEYDEVICE k
-         left join ZCGL_DEVICE z on k.SBBM = z.SBBM;
+         left join ZCGL_DEVICE z on k.SBBM = z.SBBM
+where to_number(z.TBZT) > 20
+order by k.CREATETIME desc;
+
+
 
 select *
-from KEYDEVICE
-where REPORTSTATUS = '0';
+from CODEDETAIL
+where TYPEID = 'GenderCode';
+
+select *
+from ROLEINFO
+where ROLEID = '200000200000011197';
+
+select *
+from KEYDEVICE k
+         left join ZCGL_DEVICE z on k.SBBM = z.SBBM
+where k.REPORTSTATUS = 0
+  and to_number(z.TBZT) > 20;
+
+delete
+from ZCGL_DEVICE;
+
+delete
+from ZCGL_DEVICE_SOURCE;
+
+alter table ZCGL_DEVICE_SOURCE
+    modify ASSERTSTATUS VARCHAR2(1000);
+
+select *
+from CODECATALOG;
+
+insert into CODECATALOG (ID, CNT, TYPE) values ('TBZT', '同步状态', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE) values ('SBZT', '设备状态', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE) values ('SXJGNLX', '功能类型', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE) values ('SXJCJQY', '采集区域', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE) values ('JKDWLX', '点位类型', '摄像机');
+
+
+select *
+from CODEDETAIL
+where TYPEID = 'SBZT';
+
+SELECT *
+FROM ZCGL_DEVICE z
+WHERE (instr('/' || z.SXJGNLX || '/', '/' || '1' || '/') > 0
+    OR instr('/' || z.SXJGNLX || '/', '/' || '1' || '/') > 0)
+  AND substr(z.SBBM, 0, 6) LIKE '61%' || '%'
+  AND to_number(z.TBZT) > 10
+  AND instr('/' || 'A0101/A0102/A0103/A0105/A0201/A0301/A0602/A0605/B0701/B0702/B0801/B1101' || '/',
+            '/' || z.SXJCJQY || '/') > 0
+  AND NOT EXISTS(SELECT SBBM FROM KEYDEVICE k WHERE z.SBBM = k.SBBM);
+
+
+create table DISTRIBUTED_KEYDEVICE
+(
+    SBBM             varchar2(20) primary key not null,
+    DISTRIBUTED_TIME date default sysdate
+);
