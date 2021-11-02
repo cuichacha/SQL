@@ -396,14 +396,6 @@ update ZCGL_DEVICE
 set TSSJ = sysdate
 where TBZT = 1;
 
-select IP
-from ZCGL_DEVICE
-where IP = '10.80.0.120'
-  and SBBM != '61012299001310000028';
-
-
-select *
-from ZCGL_DEVICE;
 
 select *
 from ZCGL_DEVICE
@@ -732,17 +724,6 @@ alter table ZCGL_DEVICE_SOURCE
 
 select *
 from CODECATALOG;
-
-insert into CODECATALOG (ID, CNT, TYPE)
-values ('TBZT', '同步状态', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE)
-values ('SBZT', '设备状态', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE)
-values ('SXJGNLX', '功能类型', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE)
-values ('SXJCJQY', '采集区域', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE)
-values ('JKDWLX', '点位类型', '摄像机');
 
 
 select *

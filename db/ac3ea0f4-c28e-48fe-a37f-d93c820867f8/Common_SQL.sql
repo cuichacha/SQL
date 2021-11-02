@@ -670,24 +670,6 @@ from CODEDETAIL c,
 where t7.RKLX = c.ID
   and c.TYPEID = 'casetype';
 
-select *
-from CODEDETAIL
-where TYPEID like '%Gender%';
-
-
-
-select *
-from CODEDETAIL
-where TYPEID like '%GZJB%';
-
-select *
-from CODEDETAIL
-where TYPEID = 'nationalityCode';
-
-select *
-from EQP_AREA
-where ID like '%610%';
-
 
 select t6.RKLX, t5.*
 from TBL_VIID_ZDR_PERSONDOC t5,
@@ -1221,18 +1203,6 @@ from TBL_VIID_ZDR_PERSONDOC
 group by RESIDENCEADMINDIVISION;
 
 
-select *
-from EQP_AREA
-where name like '%铜%';
-
-select *
-from EQP_AREA
-where ID like '6102%';
-
-select *
-from EQP_AREA
-where EQP_AREA.ID = '610403';
-
 select RESIDENCEADMINDIVISION, LONGITUDE, LATITUDE
 from TBL_VIID_ZDR_PERSONDOC;
 
@@ -1336,14 +1306,6 @@ from (select substr(RESIDENCEADMINDIVISION, 0, 4) as placeCode, count(1) as coun
          left join EQP_AREA e on p.placeCode = e.ID or RPAD(p.placeCode, 6, '0') = e.ID;
 
 
-
-select *
-from KEYUNIT_VISITOR;
-
-select *
-from CODEDETAIL
-where TYPEID like 'Gender%';
-
 select (select cnt from CODEDETAIL c where c.ID = a.GENDERCODE and c.TYPEID = 'GenderCode')      as gender,
        (select cnt from CODEDETAIL c where c.ID = a.KEYUNITID and c.TYPEID = 'KeyUnitAlarmType') as keyUnitAlarmType,
        r.ROLENAME,
@@ -1382,21 +1344,6 @@ set PHOTO = (select SMALLIMAGEDATA
              where ID = '1100000000000220200103103214100012021041623020300000045')
 where ID = '20210508163245000001';
 
-select *
-from KEYUNIT_VISITOR;
-
-select *
-from CODEDETAIL
-where TYPEID = 'EthicCode'
-  and CNT = '汉族';
-
-select *
-from KEYUNIT
-where UNITNAME = '';
-
-select *
-from DEPARTMENT
-where DEPARTNAME = '';
 
 select distinct (select ID
                  from CODEDETAIL
@@ -1410,45 +1357,11 @@ select distinct (select ID
                  where DEPARTNAME = '') as department
 from KEYUNIT;
 
-select count(1)
-from KEYUNIT_VISITOR
-where STATUS = 1
-  and KEYUNITID = '200100200000012001';
-
-select *
-from KEYUNIT_VISITOR;
-
-select ID
-from KEYUNIT
-where FULLPATH like '1%'
-   or ID = '1';
-
-select FULLPATH
-from KEYUNIT
-where ID = '2002';
-
 select *
 from KEYUNIT_ALARM
 where KEYUNITID in (select ID
                     from KEYUNIT
                     where FULLPATH like '200100200000012001$2002%');
-
-select FULLPATH
-from KEYUNIT
-where ID = '2002';
-
-select ID
-from KEYUNIT
-where FULLPATH like '200100200000012001$2002%';
-
-select *
-from KEYUNIT_ALARM
-where KEYUNITID in ('2001', '2002');
-
-select ID
-from KEYUNIT
-where AREACODE = '200000200000011035';
-
 
 
 select count(1) as count, k2.ID
@@ -1568,21 +1481,6 @@ select FULLPATH, substr(FULLPATH, 0, instr(FULLPATH, '$') - 1)
 from ROLEINFO
 where FULLPATH like '%203207200000011023';
 
-select *
-from ROLEINFO
-where ROLEID = '200000200000011035';
-
-select *
-from GEUSERDOM
-where ROLEID = '200000200000011035';
-
-select *
-from KEYUNIT
-where ID = '';
-
-select *
-from ROLEINFO
-where ROLEID = '200000200000011052';
 
 select ROLEID
 from ROLEINFO
@@ -1590,27 +1488,12 @@ where FULLPATH like (select FULLPATH
                      from ROLEINFO
                      where ROLEID = '200000200000011052') || '%';
 
-select ID
-from KEYUNIT
-where AREACODE in ('200000200000011052');
-
-select *
-from CODEDETAIL
-where TYPEID = 'warnAlarmTypeMinor';
-
 select *
 from ATTENDANCE
 where CERTIFICATE = '341125199707141994'
   and trunc(CREATETIME) = trunc(sysdate)
   and OFFTIME is null;
 
-select *
-from ROLEINFO
-where ROLENAME like '%第五%';
-
-select *
-from ROLEINFO
-where ROLEID = '200000200000011195';
 
 select *
 from KEYUNIT_ALARM
@@ -1650,8 +1533,6 @@ where r.FULLPATH like (select FULLPATH from ROLEINFO where ROLEID = '20000020000
   and r.ROLETYPE = 5
   and r.ROLEID != '200000200000011052';
 
-select *
-from KEYUNIT;
 
 select (select cnt from CODEDETAIL c where c.ID = t.togetherPeopleType and c.TYPEID = 'RKLX')     as
                                                                                                      togetherPeopleTypeName,
@@ -1747,13 +1628,6 @@ from (select b2.GZJB                  as togetherAttentionLevel,
                left join TBL_VIID_ZDR_BASICINFO b2 on b2.ZDRID = f2.ZDRID) t;
 
 
-select DEPARTCODE, DEPARTNAME
-from DEPARTMENT
-where UNITCODE = '';
-
-select *
-from CODEDETAIL
-where TYPEID like 'warnAlarmTypeMinor';
 
 
 select DEVICEID, trunc(SHOTTIME)
@@ -1837,9 +1711,6 @@ from (select b.PLACECODE as RESIDENCEADMINDIVISION, count(1) as count, b.RKLX, b
       group by b.PLACECODE, b.RKLX, b.GZJB) p
          left join EQP_AREA e on p.RESIDENCEADMINDIVISION = e.ID;
 
-select *
-from EQP_AREA
-where ID like '61%';
 
 select v.*, e.NAME as IdExt_txt
 from VIDEOINPUT v
@@ -1876,9 +1747,6 @@ from (select substr(b.PLACECODE, 0, 4) as placeCode, count(b.ZDRID) as count
                      order by e.ID) m on m.ID like t.placeCode || '%';
 
 
-select *
-from CODEDETAIL
-where TYPEID like 'function%';
 
 select e.NAME as placeCodeName,
        count(p.ZDRID)
@@ -1915,9 +1783,6 @@ from TBL_VIID_ZDR_PERSONDOC p
 where p.LONGITUDE is not null
   and p.LATITUDE is not null;
 
-select *
-from EQP_AREA
-where NAME = '陈仓区';
 
 select e.NAME      as placeCodeName,
        p.ZDRID,
@@ -1933,9 +1798,6 @@ where p.LONGITUDE is not null
   and p.LATITUDE is not null
   and p.LATITUDE = 34.3644;
 
-select *
-from EQP_AREA
-where ID like '61%';
 
 select RANK() over (order by CREATETIME desc) as rank, b.*
 from BUSINESS_OPERATELOG b;
@@ -2173,10 +2035,6 @@ FROM (SELECT m.*, ROWNUM RN
 WHERE RN > 0;
 
 
-select *
-from CODEDETAIL
-where ID like 'Track%';
-
 select distinct DEVICEID
 from TBL_VIID_ZDR_FOOTPOINT
 where SHOTTIME <= sysdate
@@ -2190,16 +2048,6 @@ where DEVICEID in (select distinct DEVICEID
                      and SHOTTIME >= sysdate - 90)
 group by ZDRID;
 
-select ZDRID
-from TBL_VIID_ZDR_BASICINFO
-where XM = '朱代红';
-
-select *
-from TBL_VIID_ZDR_PCFX
-where ZDRID = '';
-
-select count(1)
-from TBL_VIID_ZDR_PCFX;
 
 select count(*), ZDRID, ACTIVITYDATE, IDNUMBER, DEVICEID
 from TBL_VIID_ZDR_PCFX
@@ -2521,36 +2369,11 @@ group by mg.RIGHTNAME;
 
 
 
-select *
-from COMMONMENUGROUP
-where GROUPID = '6083520';
-
-select *
-from COMMONUSERGROUP
-where USERID = '200000200000010001';
-
-select *
-from GEUSERDOM
-where USERID = '200000200000010001';
-
-
 select q.NAME
 from tbl_viid_zdr_footpoint f
          left join VIDEOINPUT v on f.deviceId = v.gat1400
          left join eqp_area q on rpad(substr(f.deviceid, 0, 6), 6, '0') = rpad(q.id, 6, '0');
 
-select *
-from EQP_AREA
-where ID = '610403';
-
-select *
-from COMMONMENUGROUP
-where MENUID like '500030%'
-  and TYPE = 'OMOA';
-
-select *
-from CODEDETAIL
-where TYPEID = 'SXJCJQY';
 
 select row_number() over (partition by SBBM order by RKSJ desc) as seq
 from ZCGL_DEVICE;
@@ -2568,27 +2391,6 @@ order by RKSJ desc;
 
 select to_number()
 from CODEDETAIL;
-
-
-select *
-from COMMONGROUP
-where TYPE = 'ZCGL';
-
-select *
-from COMMONGROUP
-where GROUPNAME = '地市版管理员';
-
-select *
-from COMMONGROUP
-where GROUPID like '6083537';
-
-select *
-from COMMONMENUGROUP
-where TYPE = 'ZCGL';
-
-select *
-from COMMONUSERGROUP
-where TYPE = 'ZCGL';
 
 select userid,
        username,
@@ -2608,21 +2410,6 @@ where not exists(
     from roleinfo
     where fullpath like (select fullpath from roleinfo where roleid = '610000000000002000') || '%'
 );
-
-select *
-from GEUSERDOM
-where USERID = '200000200000015184';
-
-select *
-from GEUSERDOM
-where EMAILADDR like 'admin001%';
-
-select *
-from ROLEINFO
-where ROLEID = '610000000000002000';
-
-select *
-from ROLEINFO;
 
 select *
 from roleinfo
@@ -2951,12 +2738,6 @@ from TBL_VIID_ZDR_FOOTPOINT
 where ZDRID = '3_2020103014402200001'
 order by SHOTTIME desc;
 
-select *
-from GEOPERATELOG;
-
-select *
-from CODEDETAIL
-where TYPEID = 'RKLX';
 
 
 select t.SHOTTIME,
@@ -3448,9 +3229,3 @@ from v
                       and SHOTTIME <= to_date('2021-12-05 00:00:00', 'yyyy-MM-dd hh24:mi:ss')) f2
                    on v.ZDRID = f2.ZDRID and f2.seq = 1;
 
-select *
-from ROLEINFO
-where ROLEID = '200000200000011197';
-
-select count(*)
-from TBL_VIID_ZDR_FOOTPOINT where ZDRID = '4_2020103014402200001';
