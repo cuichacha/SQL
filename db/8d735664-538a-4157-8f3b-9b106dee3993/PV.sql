@@ -733,11 +733,16 @@ alter table ZCGL_DEVICE_SOURCE
 select *
 from CODECATALOG;
 
-insert into CODECATALOG (ID, CNT, TYPE) values ('TBZT', '同步状态', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE) values ('SBZT', '设备状态', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE) values ('SXJGNLX', '功能类型', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE) values ('SXJCJQY', '采集区域', '摄像机');
-insert into CODECATALOG (ID, CNT, TYPE) values ('JKDWLX', '点位类型', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE)
+values ('TBZT', '同步状态', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE)
+values ('SBZT', '设备状态', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE)
+values ('SXJGNLX', '功能类型', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE)
+values ('SXJCJQY', '采集区域', '摄像机');
+insert into CODECATALOG (ID, CNT, TYPE)
+values ('JKDWLX', '点位类型', '摄像机');
 
 
 select *
@@ -760,3 +765,17 @@ create table DISTRIBUTED_KEYDEVICE
     SBBM             varchar2(20) primary key not null,
     DISTRIBUTED_TIME date default sysdate
 );
+comment on column DISTRIBUTED_KEYDEVICE.SBBM is '设备编码';
+comment on column DISTRIBUTED_KEYDEVICE.DISTRIBUTED_TIME is '下发时间';
+
+
+select *
+from ZDRINFO z
+where exists(select JQBH
+             from JQFOLLOW
+             where z.ID = JQBH and FOLLOWER = 'admin001@zjtek.com') and ISDELETE = '0';
+
+select *
+from EQP_AREA where ID like '61%';
+
+
