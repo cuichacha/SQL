@@ -131,7 +131,7 @@ alter view dc_lock as
 # 视频留言相关结束---------------------------------------------------------------------------------------------------------
 
 
-# 蓝牙蒙版繁体字开始————————————————————————————————————————————————————————————————————————————————————————————————————
+# 蓝牙蒙版繁体字开始————————————————————————————————————————————————————————————————————————————————————————————————————————
 alter table cc_lock_mask
     add language_type tinyint comment '语言类型';
 
@@ -143,9 +143,9 @@ alter table cc_lock_mask
 
 update cc_lock_mask
 set parent_id = id;
-# 蓝牙蒙版繁体字结束————————————————————————————————————————————————————————————————————————————————————————————————————
+# 蓝牙蒙版繁体字结束————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-# 固件强制覆盖开始————————————————————————————————————————————————————————————————————————————————————————————————————
+# 固件强制覆盖开始——————————————————————————————————————————————————————————————————————————————————————————————————————————
 
 create table app_firmware_version_new
 (
@@ -154,7 +154,7 @@ create table app_firmware_version_new
     create_date      datetime      not null comment '创建时间',
     update_date      datetime      null comment '最后修改时间',
     version          bigint        not null comment '版本号',
-    firmware_version varchar(50)   null comment '版本号规则 T700/D700-0.0/1.00?以及(20160829之前-不包括20160704,20160720), S800/T510-0.2.00?(S800还有20160704), T710-0.3.00?(以及20160720), D820-0.4.00?',
+    firmware_version varchar(50)   null comment '版本号',
     firmware_type    int           null comment '1:APP软件版本 2:锁具固件版本 3,4. 室内机下载程序 5.手环更新程序 6. 猫眼更新程序',
     url              varchar(1024) null comment 'URL',
     state            int           null comment '0:无效 1：有效',
@@ -181,17 +181,9 @@ create table app_firmware_version_account_relation_new
 create index INDEX_app_firmware_version_id
     on app_firmware_version_account_relation_new (app_firmware_version_id);
 
-# 固件强制覆盖开始————————————————————————————————————————————————————————————————————————————————————————————————————
+# 固件强制覆盖结束——————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-
-
-
-
-
-
-
-
-
+# dc_lock_location_new开始————————————————————————————————————————————————————————————————————————————————————————————————————
 
 CREATE TABLE `dc_lock_location_new`
 (
@@ -206,34 +198,86 @@ CREATE TABLE `dc_lock_location_new`
   DEFAULT CHARSET = utf8;
 
 
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448426, 252140895889011, 3084106820, '江苏省', '镇江市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448425, 261631177725666, 3085100716, '重庆市', '重庆市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448424, 222607591121424, 1875313755, '北京市', '北京市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448423, 278169839357416, 1933332911, '河南省', '郑州市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448418, 218252504935431, 1900529103, '广东省', '佛山市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448417, 268777365370732, 3085291718, '重庆市', '重庆市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448416, 217604867379207, 979674477, '浙江省', '杭州市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448415, 272646822198429, 1894093126, '山东省', '济南市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448414, 279681305950733, 3746493271, '山东省', '潍坊市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448413, 223511359251126, 1987360323, '四川省', '宜宾市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448412, 269589746910405, 3755307004, '广东省', '深圳市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448411, 224342135242469, 3084999672, '云南省', '玉溪市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448410, 275967484503318, 3079696085, '浙江省', '绍兴市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448409, 230631811777394, 3084446061, '江西省', '赣州市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448408, 213175982952216, 829838623, '新疆维吾尔自治区', '乌鲁木齐市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448407, 253508772453511, 3055557873, '山东省', '济南市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448406, 236347702550572, 1912263784, '重庆市', '重庆市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448405, 248609728784779, 3664626061, '浙江省', '杭州市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090410448404, 260527048847491, 2028288446, '[]', '[]');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448445, 229114976758131, 1879684699, '山东省', '青岛市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448444, 231981354897361, 2071355877, '北京市', '北京市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448443, 211853494006097, 710630694, '甘肃省', '兰州市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448442, 214077097696739, 666663452, '浙江省', '宁波市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448441, 236244392175540, 976400844, '湖北省', '宜昌市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448440, 216448121315424, 2029314727, '北京市', '北京市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448439, 231176102908135, 1017750884, '安徽省', '芜湖市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448438, 244769023213755, 466422628, '山东省', '潍坊市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448433, 252477241608819, 2029174331, '安徽省', '合肥市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448432, 275922743027386, 3751167516, '湖南省', '常德市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448431, 227929039603719, 977000731, '广西壮族自治区', '南宁市');
-INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`) VALUES (1773685090409448430, 242215221539425, 1910698624, '辽宁省', '大连市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448426, 252140895889011, 3084106820, '江苏省', '镇江市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448425, 261631177725666, 3085100716, '重庆市', '重庆市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448424, 222607591121424, 1875313755, '北京市', '北京市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448423, 278169839357416, 1933332911, '河南省', '郑州市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448418, 218252504935431, 1900529103, '广东省', '佛山市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448417, 268777365370732, 3085291718, '重庆市', '重庆市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448416, 217604867379207, 979674477, '浙江省', '杭州市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448415, 272646822198429, 1894093126, '山东省', '济南市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448414, 279681305950733, 3746493271, '山东省', '潍坊市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448413, 223511359251126, 1987360323, '四川省', '宜宾市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448412, 269589746910405, 3755307004, '广东省', '深圳市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448411, 224342135242469, 3084999672, '云南省', '玉溪市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448410, 275967484503318, 3079696085, '浙江省', '绍兴市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448409, 230631811777394, 3084446061, '江西省', '赣州市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448408, 213175982952216, 829838623, '新疆维吾尔自治区', '乌鲁木齐市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448407, 253508772453511, 3055557873, '山东省', '济南市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448406, 236347702550572, 1912263784, '重庆市', '重庆市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448405, 248609728784779, 3664626061, '浙江省', '杭州市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090410448404, 260527048847491, 2028288446, '[]', '[]');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448445, 229114976758131, 1879684699, '山东省', '青岛市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448444, 231981354897361, 2071355877, '北京市', '北京市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448443, 211853494006097, 710630694, '甘肃省', '兰州市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448442, 214077097696739, 666663452, '浙江省', '宁波市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448441, 236244392175540, 976400844, '湖北省', '宜昌市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448440, 216448121315424, 2029314727, '北京市', '北京市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448439, 231176102908135, 1017750884, '安徽省', '芜湖市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448438, 244769023213755, 466422628, '山东省', '潍坊市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448433, 252477241608819, 2029174331, '安徽省', '合肥市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448432, 275922743027386, 3751167516, '湖南省', '常德市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448431, 227929039603719, 977000731, '广西壮族自治区', '南宁市');
+INSERT INTO `dsmzg_db`.`dc_lock_location_new` (`id`, `lock_mac`, `ip`, `province`, `city`)
+VALUES (1773685090409448430, 242215221539425, 1910698624, '辽宁省', '大连市');
+
+# dc_lock_location_new结束————————————————————————————————————————————————————————————————————————————————————————————————————
+
+# 移动侦测开始——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+create table dc_movement_detection_sync
+(
+    id                        bigint auto_increment
+        primary key,
+    create_date               datetime not null comment '创建时间',
+    update_date               datetime null comment '最后修改时间',
+    version                   bigint   not null comment '版本号',
+    lock_id                   bigint   not null comment '锁Id',
+    movement_detection_switch tinyint  null comment '移动侦测开关；0-关；1-开',
+    movement_distance         tinyint  null comment '移动侦测触发距离；1-近距离；2-中距离；3-远距离',
+    movement_duration         tinyint  null comment '移动侦测时长'
+
+)
+    charset = utf8;
+
+create index INDEX_lock_id
+    on dc_movement_detection_sync (lock_id);

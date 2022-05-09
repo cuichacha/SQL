@@ -85,4 +85,6 @@ WHERE state = 1
   AND firmware_type = 2
   AND share_meter_type IS NOT NULL
   AND SUBSTRING(firmware_version, - 8) > SUBSTRING('X0.M.A15_20210519', - 8)
-  AND share_meter_type LIKE concat('%', 'R7_0', '%')
+  AND share_meter_type LIKE concat('%', 'R7_0', '%');
+
+drop table dc_movement_detection_sync;
