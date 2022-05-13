@@ -266,15 +266,15 @@ VALUES (1773685090409448430, 242215221539425, 1910698624, '辽宁省', '大连�
 # 移动侦测开始——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 create table dc_movement_detection_sync
 (
-    id                        bigint auto_increment
+    id                          bigint auto_increment
         primary key,
-    create_date               datetime not null comment '创建时间',
-    update_date               datetime null comment '最后修改时间',
-    version                   bigint   not null comment '版本号',
-    lock_id                   bigint   not null comment '锁Id',
-    movement_detection_switch tinyint  null comment '移动侦测开关；0-关；1-开',
-    movement_distance         tinyint  null comment '移动侦测触发距离；1-近距离；2-中距离；3-远距离',
-    movement_duration         tinyint  null comment '移动侦测时长'
+    create_date                 datetime not null comment '创建时间',
+    update_date                 datetime null comment '最后修改时间',
+    version                     bigint   not null comment '版本号',
+    lock_id                     bigint   not null comment '锁Id',
+    movement_detection_switch   tinyint  null comment '移动侦测开关；0-关；1-开',
+    movement_detection_distance tinyint  null comment '移动侦测触发距离；1-近距离；2-中距离；3-远距离',
+    movement_detection_duration tinyint  null comment '移动侦测时长'
 
 )
     charset = utf8;

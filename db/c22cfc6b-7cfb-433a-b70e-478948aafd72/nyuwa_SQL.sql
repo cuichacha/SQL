@@ -88,3 +88,8 @@ WHERE state = 1
   AND share_meter_type LIKE concat('%', 'R7_0', '%');
 
 drop table dc_movement_detection_sync;
+
+select *
+from cc_firmware_version
+order by create_date desc
+limit 1;
