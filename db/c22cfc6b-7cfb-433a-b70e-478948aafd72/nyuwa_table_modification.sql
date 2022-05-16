@@ -281,3 +281,5 @@ create table dc_movement_detection_sync
 
 create index INDEX_lock_id
     on dc_movement_detection_sync (lock_id);
+
+# 移动侦测结束——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
