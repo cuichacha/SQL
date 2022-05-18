@@ -93,3 +93,7 @@ select *
 from cc_firmware_version
 order by create_date desc
 limit 1;
+
+select *
+from cc_firmware_version
+where create_date > DATE_SUB(now(), interval 15 day)
