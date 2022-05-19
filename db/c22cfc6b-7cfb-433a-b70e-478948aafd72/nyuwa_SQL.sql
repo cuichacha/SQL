@@ -96,4 +96,12 @@ limit 1;
 
 select *
 from cc_firmware_version
-where create_date > DATE_SUB(now(), interval 15 day)
+where create_date > DATE_SUB(now(), interval 15 day);
+
+update cc_firmware_version
+set state = 0
+where meter_type = 'ALI_eques';
+
+update cc_firmware_version
+set state = case when id = 282 then 1 else 0 end
+where meter_type = 'XM_eques';
