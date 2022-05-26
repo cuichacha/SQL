@@ -50,7 +50,22 @@ where id = 520172694915514369;
 
 insert into sc_online_server (create_date, update_date, version, title, title_url, title_content, useful, useless,
                               parent_id, level, status, display, operator_id)
-select create_date, update_date, version, title, title_url, title_content, useful, useless, parent_id, level, status,
-        display, operator_id
+select create_date,
+       update_date,
+       version,
+       title,
+       title_url,
+       title_content,
+       useful,
+       useless,
+       parent_id,
+       level,
+       status,
+       display,
+       operator_id
 from sc_online_server
 where id = 396;
+
+select *
+from w_wx_user
+where id in (212234003674300416, 540108810598219776);
