@@ -105,3 +105,9 @@ where meter_type = 'ALI_eques';
 update cc_firmware_version
 set state = case when id = 282 then 1 else 0 end
 where meter_type = 'XM_eques';
+
+SELECT token
+from uc_user u
+         LEFT JOIN uc_user_login_persist p ON u.id = p.user_id
+WHERE u.account = '13271339890'
+  and p.`status` = 1;
