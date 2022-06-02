@@ -111,3 +111,10 @@ from uc_user u
          LEFT JOIN uc_user_login_persist p ON u.id = p.user_id
 WHERE u.account = '13271339890'
   and p.`status` = 1;
+
+select *
+from uc_user_login_persist
+where token = 'Gbti2a3J2410v55kgr70l2j5w8T55e9b';
+
+alter table cc_lock_mask
+    auto_increment = 20;

@@ -69,3 +69,16 @@ where id = 396;
 select *
 from w_wx_user
 where id in (212234003674300416, 540108810598219776);
+
+select *
+from w_wx_user
+group by phone
+having count(phone) > 1;
+
+select *
+from w_wx_user
+where phone = '18506826185';
+
+delete
+from mc_member
+where id = 164753665666842624;
