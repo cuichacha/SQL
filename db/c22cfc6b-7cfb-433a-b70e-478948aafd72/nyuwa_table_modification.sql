@@ -283,3 +283,13 @@ create index INDEX_lock_id
     on dc_movement_detection_sync (lock_id);
 
 # 移动侦测结束——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+# 锁具工装检测配置表 增加字段
+# alter table cc_lock_base_info
+#     add lock_gz_test_config int comment '锁具工装检测配置表';
+#
+# alter table cc_lock_base_info
+#     drop lock_gz_test_config;
+
+alter table cc_lock_base_info
+    modify lock_function_config3 int;

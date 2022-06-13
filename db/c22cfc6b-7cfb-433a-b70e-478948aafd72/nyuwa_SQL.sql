@@ -118,3 +118,25 @@ where token = 'Gbti2a3J2410v55kgr70l2j5w8T55e9b';
 
 alter table cc_lock_mask
     auto_increment = 20;
+
+select value
+from cc_base_component_dictionary
+where code = 'BatteryLevel'
+  and state = 1
+  and `key` <= 832
+order by `key` desc
+limit 1;
+
+select *
+from uc_offline_message
+where id < 2022060811000000001
+  and id > 2021111115123800001
+  and account = '16642608469';
+
+select value
+from cc_base_component_dictionary
+where code = 'BatteryLevel'
+  and state = 1
+  and `key` <= 0
+order by `key` desc
+limit 1;

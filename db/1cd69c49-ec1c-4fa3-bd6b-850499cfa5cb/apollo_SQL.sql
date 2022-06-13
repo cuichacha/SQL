@@ -72,13 +72,46 @@ where id in (212234003674300416, 540108810598219776);
 
 select *
 from w_wx_user
+where common_flag = 3
+  and status is true
 group by phone
 having count(phone) > 1;
 
 select *
 from w_wx_user
-where phone = '18506826185';
+where phone = '18506826185'
+  and status is false;
 
 delete
 from mc_member
 where id = 164753665666842624;
+
+select *
+from sc_install_appoint_info
+where phone = '18506826185';
+
+# 212234003674300416
+# 201634596872519680
+
+select *
+from w_wx_user
+where phone = '18506826185'
+  and status is true
+limit 1;
+
+# 212234003674300416
+
+select *
+from sc_co_order where customer_id = 212234003674300416;
+
+select *
+from sc_co_cloud_card where card_id = 1110965215704371;
+
+select *
+from sc_co_cloud_card where card_id in (select id from pc_card);
+
+select *
+from sc_co_order_sku where id = 22943537;
+
+select *
+from sc_co_order where id = 516698782474960896;
