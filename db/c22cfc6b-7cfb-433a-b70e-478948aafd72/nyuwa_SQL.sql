@@ -114,7 +114,7 @@ WHERE u.account = '13271339890'
 
 select *
 from uc_user_login_persist
-where token = 'Gbti2a3J2410v55kgr70l2j5w8T55e9b';
+where token = '73bP4517TJ8m1JKeB5J16F4d018Q9423';
 
 alter table cc_lock_mask
     auto_increment = 20;
@@ -140,3 +140,103 @@ where code = 'BatteryLevel'
   and `key` <= 0
 order by `key` desc
 limit 1;
+
+select openway
+from dc_lock_open_door_log_new_plus;
+
+select lock_id
+from dc_lock_user
+where user_id = 422643952080916480
+  and role_type = 2
+  and state = 1;
+SELECT * FROM uc_user where account = '13271339890';
+select *
+from dc_lock
+where id in (470468754430500864,
+             489599832302821376,
+             507717616505200640
+    );
+
+select *
+from dc_lock
+where id in (481387951549325312,
+             274777124236173312
+    );
+
+select *
+from dc_lock_third_info where id = 481387951549325312;
+
+select *
+from dc_lock_order_header
+where id = 137801;
+
+select *
+from dc_lock_order_header where buyer_id = 216360614493163520;
+
+select *
+from dc_lock_order where buyer_id = 216360614493163520;
+
+select *
+from dc_lock_user where user_id = 216360614493163520;
+
+select *
+from dc_lock_order where id = 508164168713588736;
+
+select *
+from uc_user where id = 216360614493163520;
+
+select *
+from dc_lock where lock_mac = 'CA:1A:10:5C:9B:57';
+
+select lock_id from dc_lock_user where user_id = 216360614493163520 and role_type = 2 and state = 1;
+
+select *
+from dc_lock_third_info where id = 508137491644030976;
+
+select *
+from dc_lock_third_info where sn = 'fa335c160ef7288f';
+
+select *
+from dc_lock where lock_mac = 'E7:E5:65:20:F9:71';
+
+select *
+from dc_lock_order_header where iot_id = 'c365c88e19d87b9c';
+
+select *
+from dc_lock_order where iot_id = 'c365c88e19d87b9c';
+
+select *
+from dc_lock_local_user where id = 509992583108300800;
+
+select *
+from dc_lock_user where user_id = 509992583108300800;
+
+select *
+from dc_lock_user_note where note_user_id = 509992583108300800;
+
+
+select *
+from dc_lock_user where id = 510355394258812928;
+
+select *
+from dc_lock_face where lock_id = 510355391939354624;
+
+select *
+from dc_lock where id = 510355391939354624;
+
+select *
+from uc_user_login_persist where user_id = 185215651743272960;
+
+select id, lock_id, send_state
+from dc_lock_open_door_log_new_plus where lock_id = 434898463776317440 and id >= 202201190000000000 and id <= 202206200000000000 order by id;
+
+select id, lock_id, send_state
+from dc_lock_open_door_log_new_plus where lock_id = 434898463776317440 and left(id, 8) >= 20220118 and left(id, 8) <= 20220120;
+
+select count(*)
+from dc_lock_open_door_log_new_plus where lock_id = 434898463776317440 and left(id, 8) >= 20220118 and left(id, 8) <= 20220120;
+
+select * from dc_guide_video where status = 1;
+
+select *
+from dc_lock where id = 510786244880375808;

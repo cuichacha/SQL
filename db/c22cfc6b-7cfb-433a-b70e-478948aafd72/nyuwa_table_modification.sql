@@ -284,7 +284,7 @@ create index INDEX_lock_id
 
 # 移动侦测结束——————————————————————————————————————————————————————————————————————————————————————————————————————————————————
 
-# 锁具工装检测配置表 增加字段
+# 锁具工装检测配置表 增加字段——————————————————————————————————————————————————————————————————————————————————————————————————————
 # alter table cc_lock_base_info
 #     add lock_gz_test_config int comment '锁具工装检测配置表';
 #
@@ -292,4 +292,23 @@ create index INDEX_lock_id
 #     drop lock_gz_test_config;
 
 alter table cc_lock_base_info
-    modify lock_function_config3 int;
+    modify lock_function_config3 int(6);
+
+
+# 锁具虹膜—————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+
+create table dc_lock_iris
+(
+    id          bigint auto_increment
+        primary key,
+    create_date datetime           null,
+    update_date datetime           null,
+    version     bigint default 200 null,
+    lock_id     bigint             null comment '锁具id',
+    iris_id     varchar(50)        null comment '虹膜id',
+    user_id     bigint             null comment '用户id'
+)
+    charset = utf8;
+
+alter table lock_info
+    add column iris_unused_num tinyint;
