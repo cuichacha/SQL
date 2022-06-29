@@ -200,7 +200,16 @@ where user_id = (select ID
 
 select *
 from uc_user_login_persist
-where token = '0T1GRFi75y66HXmz05I2807248wRlFMH';
+where token = '87L60iV92P5QiZVLxySp1830fF09te4B';
+
+select *
+from uc_user_login_persist
+where user_id = 506094465115492352
+  and status is true;
+
+select *
+from dc_lock_user
+where user_id = 506094465115492352;
 
 select *
 from uc_user_login_persist
@@ -238,16 +247,94 @@ from dc_lock_local_user u
 where u.nick_name != n.note;
 
 select *
-from uc_wx_user where phone = '15991190790';
+from uc_wx_user
+where phone = '15991190790';
 
 select id, lock_id, send_state
-from dc_lock_open_door_log_new_plus where lock_id = 143591471843385344 and left(id, 8) >= '20220530' and left(id, 8) <= '20220630' order by id;
+from dc_lock_open_door_log_new_plus
+where lock_id = 143591471843385344
+  and left(id, 8) >= '20220530'
+  and left(id, 8) <= '20220630'
+order by id;
 
 
 select *
-from dc_lock where id = 510786244880375808;
+from dc_lock
+where id = 512546627949436928;
 
 select *
-from cc_lock_base_info where lock_mac = 'FA:E1:50:BA:B9:2A';
+from cc_lock_base_info
+where lock_mac = 'FA:E1:50:BA:B9:2A';
 
-select * from dc_guide_video where status = 1
+select *
+from dc_guide_video
+where status = 1;
+
+select id, lock_id, send_state
+from dc_lock_open_door_log_new_plus
+where lock_id = 143591471843385344
+  and left(id, 8) >= 20220530
+  and left(id, 8) <= 20220630
+order by id
+limit 500;
+
+select count(*)
+from cc_firmware_version;
+
+select *
+from uc_user
+where account = '11112000001';
+
+
+select *
+from uc_user
+where account = '18930953585';
+
+select *
+from cc_lock_base_info
+where lock_mac = 'D1:3D:90:C3:BB:CF';
+
+select *
+from dc_lock_user
+where account = '16642608469';
+
+select *
+from dc_lock
+where id = 512546627949436928;
+
+select *
+from dc_lock_open_door_log_new_plus
+where lock_id = 512546627949436928
+limit 10;
+
+select *
+from cc_lock_base_info
+where lock_mac = 'FB:B1:66:14:24:E7';
+
+select *
+from cc_base_device_info
+where meter_type like 'K10%';
+
+select *
+from cc_base_firmware_info
+where meter_type like 'K10%';
+
+select count(uu.account)
+from dc_lock_user dlu
+         left join uc_user uu on dlu.user_id = uu.id
+         left join dc_lock dl on uu.account != dl.manage_account
+where dlu.role_type = 2;
+
+select account
+from dc_lock_user
+where role_type = 2
+limit 500;
+
+select dl.manage_account, dlu.account
+from dc_lock dl
+         left join dc_lock_user dlu on dl.id = dlu.lock_id
+where dl.manage_account != dlu.account
+  and dlu.role_type = 2 limit 20;
+
+select *
+from dc_lock_user where lock_id = 322902461180289024;

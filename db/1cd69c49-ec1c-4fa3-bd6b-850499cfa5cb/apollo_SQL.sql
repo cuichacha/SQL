@@ -118,3 +118,6 @@ from sc_co_order where id = 551694904310104064;
 
 select *
 from sc_install_appoint_pic where channel_order_id = 104822459911393280;
+
+select *
+from sc_mot_judge where lock_mac = 'C6:65:4A:18:B3:2B' and create_date < DATE_SUB(now(), interval 1 hour ) and source_type = 1 and status = 0 and push_time < 5;
