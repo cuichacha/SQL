@@ -102,22 +102,39 @@ limit 1;
 # 212234003674300416
 
 select *
-from sc_co_order where customer_id = 212234003674300416;
+from sc_co_order
+where customer_id = 212234003674300416;
 
 select *
-from sc_co_cloud_card where card_id = 1110965215704371;
+from sc_co_cloud_card
+where card_id = 1110965215704371;
 
 select *
-from sc_co_cloud_card where card_id in (select id from pc_card);
+from sc_co_cloud_card
+where card_id in (select id from pc_card);
 
 select *
-from sc_co_order_sku where id = 22943537;
+from sc_co_order_sku
+where id = 22943537;
 
 select *
-from sc_co_order where id = 551694904310104064;
+from sc_co_order
+where id = 551694904310104064;
 
 select *
-from sc_install_appoint_pic where channel_order_id = 104822459911393280;
+from sc_install_appoint_pic
+where channel_order_id = 104822459911393280;
 
 select *
-from sc_mot_judge where lock_mac = 'C6:65:4A:18:B3:2B' and create_date < DATE_SUB(now(), interval 1 hour ) and source_type = 1 and status = 0 and push_time < 5;
+from sc_mot_judge
+where lock_mac = 'C6:65:4A:18:B3:2B'
+  and create_date < DATE_SUB(now(), interval 1 hour)
+  and source_type = 1
+  and status = 0
+  and push_time < 5;
+
+select *
+from sc_co_order where channel_order_id = 554992941589594112;
+
+select *
+from sc_co_order where id = 554992941589594112;
