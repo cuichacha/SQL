@@ -138,3 +138,23 @@ from sc_co_order where channel_order_id = 554992941589594112;
 
 select *
 from sc_co_order where id = 554992941589594112;
+
+select *
+from erc_waybill_batch_detail where batch_no = 'http://dsmzg.com/app/?i=Q5M_0|888888|DSM-20180524161355335|lock|1';
+
+select *
+from sc_co_order where id = 504398058571431936;
+
+select *
+from sc_install_order_detail where co_order_id = 554992941589594112;
+
+select *
+from sc_install_order where id = 447701400891031552;
+
+select *
+from sc_co_order where customer_id = 212234003674300416;
+
+SELECT * FROM sc_co_order_sku where co_order_id= 555036081696538624;
+
+select *
+from erc_part where inner_part_code = 'XN0001'

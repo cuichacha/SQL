@@ -334,7 +334,49 @@ select dl.manage_account, dlu.account
 from dc_lock dl
          left join dc_lock_user dlu on dl.id = dlu.lock_id
 where dl.manage_account != dlu.account
-  and dlu.role_type = 2 limit 20;
+  and dlu.role_type = 2
+limit 20;
 
 select *
-from dc_lock_user where lock_id = 322902461180289024;
+from dc_lock_user
+where lock_id = 322902461180289024;
+
+select *
+from dc_lock_user
+where user_id = (select id from uc_user where uc_user.account = '15592606216');
+
+select *
+from dc_lock
+where id = 244295337819250688;
+
+select *
+from cc_user_config
+where lock_id = 244295337819250688
+  and user_id = 241727794512400384
+  and config_name = 'USER_PHONE_OPEN_DOOR_STATUS';
+
+select *
+from cc_user_config
+where lock_id = 244295337819250688
+#   and user_id = 241727794512400384
+  and config_name = 'USER_PHONE_OPEN_DOOR_STATUS';
+
+select *
+from cc_user_config
+where lock_id = 244295337819250688
+  and config_name = 'USER_PHONE_ALL_OPEN_DOOR_STATUS';
+
+select *
+from uc_user
+where id in (441148661171228673,
+             466416650522988545,
+             468546804460294145,
+             258742264002514945,
+             492443119933984769
+    );
+
+select *
+from cc_lock_base_info where lock_mac = 'DF:6A:75:DA:3F:33';
+
+select *
+from dc_lock where lock_mac = 'DF:6A:75:DA:3F:33';
