@@ -376,7 +376,52 @@ where id in (441148661171228673,
     );
 
 select *
-from cc_lock_base_info where lock_mac = 'DF:6A:75:DA:3F:33';
+from cc_lock_base_info
+where lock_mac = 'DF:6A:75:DA:3F:33';
 
 select *
-from dc_lock where lock_mac = 'DF:6A:75:DA:3F:33';
+from dc_lock
+where lock_mac = 'DF:6A:75:DA:3F:33';
+
+select *
+from dc_lock_third_info
+where id = 510642994903261184;
+
+select *
+from dc_lock
+where id = 510642994903261184;
+
+select *
+from dc_lock
+where lock_mac = 'D0:D9:CE:B4:00:80';
+
+select *
+from uc_coupon_records
+where user_id = 514989833840496640
+#   and lock_id = 515001058473287680
+#   and receive_status = 1
+#   and end_date >= NOW()
+order by id desc;
+
+select *
+from uc_coupon
+where id = 12;
+
+select id, lock_id, send_state
+from dc_lock_open_door_log_new_plus
+where lock_id = 379847560560386048
+  and left(id, 8) >= 20220704
+  and left(id, 8) <= 20220707
+order by id
+limit 500;
+
+select *
+from dc_lock_open_door_log_new_plus
+where lock_id = 379847560560386048
+order by id desc
+limit 500;
+
+select *
+from dc_lock where lock_mac = 'C7:49:D7:A7:3C:41';
+
+update dc_lock set cateye_battery = null where lock_mac = 'C7:49:D7:A7:3C:41';

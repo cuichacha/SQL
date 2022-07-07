@@ -322,3 +322,10 @@ from bc_roles;
 
 select *
 from dc_lock_face;
+
+select *
+from uc_wx_user
+where phone = '13812341234';
+
+select *
+from uc_user where account = '13812341234';
