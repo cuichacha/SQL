@@ -422,6 +422,52 @@ order by id desc
 limit 500;
 
 select *
-from dc_lock where lock_mac = 'C7:49:D7:A7:3C:41';
+from dc_lock
+where lock_mac = 'C7:49:D7:A7:3C:41';
 
-update dc_lock set cateye_battery = null where lock_mac = 'C7:49:D7:A7:3C:41';
+update dc_lock
+set cateye_battery = null
+where lock_mac = 'C7:49:D7:A7:3C:41';
+
+select *
+from cc_user_config
+where lock_id = 51874
+  and user_id = 45330
+  and config_name = 'USER_PHONE_OPEN_DOOR_STATUS';
+
+select *
+from cc_user_config
+where lock_id = 51874
+  and config_name = 'USER_PHONE_ALL_OPEN_DOOR_STATUS';
+
+select *
+from cc_user_config
+where user_id = 45330;
+
+select *
+from dc_lock_open_door_log_new_plus
+where lock_id = 511724056429469696
+  and openway = 2
+order by id desc;
+
+select *
+from uc_user
+where account = '13617727322';
+
+select *
+from dc_lock
+where id = 504898914445434880;
+
+select *
+from dc_lock_user
+where lock_id = 504898914445434880
+order by id desc;
+
+select *
+from cc_lock_base_info
+where lock_mac = 'C7:84:71:42:36:3A';
+
+select *
+from uc_user_login_persist
+where user_id = 504898667174432768
+  and status is true;
