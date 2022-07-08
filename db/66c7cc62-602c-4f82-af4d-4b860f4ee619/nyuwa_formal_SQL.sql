@@ -165,11 +165,6 @@ from dc_lock_user
 where lock_id = 125070731175272448;
 
 select *
-from cc_user_config
-where lock_id = 422656629658361856
-  and user_id = #{userId} and config_name = #{configName};
-
-select *
 from cc_banner
 where position = 10
   and state = 10;
