@@ -310,6 +310,9 @@ from uc_user
 where id = 216748611357118464;
 
 select *
+from uc_user where account = '18558508586';
+
+select *
 from cc_lock_base_info
 where lock_mac = 'FB:B1:66:14:24:E7';
 
@@ -325,7 +328,17 @@ from dc_lock_face;
 
 select *
 from uc_wx_user
-where phone = '16642608469';
+where open_id = 'oIg16wJcALVTbKjQeCxSHzA-g6BI';
 
 select *
-from uc_user where account = '13812341234';
+from uc_wx_user
+where open_id = 'oIg16wBQ8sMxqgOeXg9UOeXa6gR8';
+
+select *
+from uc_user where account = '17857158909';
+
+select *
+from uc_user where account = '17857695417';
+
+select *
+from uc_user where ;

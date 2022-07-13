@@ -466,3 +466,65 @@ select *
 from uc_user_login_persist
 where user_id = 504898667174432768
   and status is true;
+
+select *
+from uc_user
+where account = '18658508586';
+
+select *
+from uc_wx_user
+where nick_name like 'pk就%';
+
+select *
+from uc_wx_user
+where open_id = 'oIg16wJcALVTbKjQeCxSHzA-g6BI';
+
+select *
+from uc_wx_user
+where union_id = 'obRDXv2UjXTsv56cGpSTfZvk8WXA';
+
+select *
+from uc_wx_user
+where open_id = 'o9C_5wKIldWDVJ4oEz_SQZkgba4c';
+
+select *
+from uc_wx_user
+where open_id = 'oIg16wBQ8sMxqgOeXg9UOeXa6gR8';
+
+select *
+from uc_user
+where account = '17857695417';
+
+select id
+from dc_lock
+where meter_type = 'Q5S_0'
+order by create_date desc
+limit 10;
+
+
+select *
+from dc_lock_open_door_log_new_plus
+where lock_id in (517959054476189696,
+                  517957934043373568,
+                  517956613227683840,
+                  517948326365110272,
+                  517948015118393344,
+                  517947527387947008,
+                  517946090369064960,
+                  517944567312424960,
+                  517943174375677952,
+                  517938928041336832
+    )
+order by id desc
+limit 10;
+
+select *
+from dc_lock
+where id = 517959054476189696;
+
+select *
+from dc_lock_open_door_log_new_plus
+where lock_id = 517959054476189696;
+
+select *
+from cc_lock_base_info where lock_mac = 'EC:1E:A3:2E:47:23';
